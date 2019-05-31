@@ -1,0 +1,94 @@
+<template>
+  <a-card :bordered="false">
+    <s-table ref="table" size="default" rowKey="key" :columns="columns" :data="loadData">
+      <span slot="pdfUrl" slot-scope="text, record">
+        <template>
+          <a :href="record.pdfUrl">{{ record.pdfUrl }}</a>
+        </template>
+      </span>
+
+      <span slot="action" slot-scope="text, record">
+        <template>
+          <a @click="handleModify(record)">修改</a>
+        </template>
+      </span>
+    </s-table>
+    <entity-modify-modal ref="entityModifyModal" @ok="handleOk"/>
+  </a-card>
+</template>
+
+<script>
+import moment from "moment";
+import { STable } from "@/components";
+import EntityModifyModal from "./modules/EntityModifyModal";
+import { listEntities } from "@/api/user";
+
+export default {
+  name: "EntityHistory",
+  components: {
+    STable,
+    EntityModifyModal
+  },
+  data() {
+    return {
+      mdl: {},
+      queryParam: {},
+      //表头
+      columns: [
+        {
+          title: "文本内容",
+          dataIndex: "content"
+        },
+        {
+          title: "状态",
+          dataIndex: "passed",
+          width: "100px",
+          customRender: status =>
+            status === -1 ? "未审核" : status == 0 ? "未通过" : "已通过"
+        },
+        {
+          title: "PDF文件",
+          dataIndex: "pdfUrl",
+          width: "5%",
+          scopedSlots: { customRender: "pdfUrl" }
+        },
+        {
+          title: "PDF页码",
+          dataIndex: "pdfNo",
+          width: "100px"
+        },
+        {
+          title: "审核日期",
+          dataIndex: "verDate",
+          width: "120px"
+        },
+        {
+          title: "操作",
+          dataIndex: "action",
+          width: "100px",
+          scopedSlots: { customRender: "action" }
+        }
+      ],
+      // 加载数据方法 必须为 Promise 对象
+      loadData: parameter => {
+        console.log("loadData.parameter", parameter);
+        Object.assign(this.queryParam, parameter);
+        return listEntities(this.queryParam).then(res => {
+          return res.result;
+        });
+      }
+    };
+  },
+  created() {
+    // getRoleList({ t: new Date() });
+  },
+  methods: {
+    handleModify(record) {
+      this.$refs.entityModifyModal.edit(record);
+    },
+    handleOk() {
+      this.$refs.table.refresh();
+    }
+  }
+};
+</script>
