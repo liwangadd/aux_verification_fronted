@@ -19,6 +19,9 @@
           <a-input v-if="mdl.type === 0" disabled value="实体标注"/>
           <a-input v-if="mdl.type === 1" disabled value="关系标注"/>
         </a-form-item>
+        <a-form-item label="审核意见" labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="['description']"/>
+        </a-form-item>
         <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
             v-decorator="['passed', {rules: [{required:true}]}]"
@@ -69,7 +72,7 @@ export default {
       const {
         form: { validateFields }
       } = this;
-      const validateFieldsKey = ['content', 'passed']
+      const validateFieldsKey = ['content', 'description', 'passed']
       this.confirmLoading = true;
       validateFields(validateFieldsKey, {force: true}, (errors, values) => {
         if (!errors) {

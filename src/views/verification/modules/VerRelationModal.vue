@@ -26,6 +26,9 @@
             :value="reflect.relationId">{{ reflect.relationName }}</a-select-option>
           </a-select>
         </a-form-item>
+        <a-form-item label="审核意见" ：labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="['description']"/>
+        </a-form-item>
         <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
             v-decorator="['passed', {rules: [{required:true}]}]"
@@ -75,7 +78,7 @@ export default {
       const {
         form: { validateFields }
       } = this;
-      const validateFieldsKey = ['content', 'relationId', 'passed']
+      const validateFieldsKey = ['content', 'relationId', 'description', 'passed']
       this.confirmLoading = true;
 
       validateFields((errors, values) => {
