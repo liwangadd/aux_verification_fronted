@@ -1,6 +1,11 @@
 <template>
   <a-card :bordered="false">
     <s-table ref="table" size="default" rowKey="key" :columns="columns" :data="loadData">
+
+      <span slot="status" slot-scope="text">
+        <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+      </span>
+
       <span slot="pdfUrl" slot-scope="text, record">
         <template>
           <a :href="record.pdfUrl">{{ record.pdfUrl }}</a>
@@ -23,8 +28,27 @@ import { STable } from "@/components";
 import EntityModifyModal from "./modules/EntityModifyModal";
 import { listEntities } from "@/api/user";
 
+const statusMap = {
+  // 0: {
+  //   status: 'default',
+  //   text: '关闭'
+  // },
+  2: {
+    status: 'processing',
+    text: '已通过'
+  },
+  0: {
+    status: 'success',
+    text: '未审核'
+  },
+  1: {
+    status: 'error',
+    text: '未通过'
+  }
+}
+
 export default {
-  name: "EntityHistory",
+  name: 'EntityHistory',
   components: {
     STable,
     EntityModifyModal
@@ -36,59 +60,66 @@ export default {
       //表头
       columns: [
         {
-          title: "文本内容",
-          dataIndex: "content"
+          title: '文本内容',
+          dataIndex: 'content'
         },
         {
-          title: "状态",
-          dataIndex: "passed",
-          width: "100px",
-          customRender: status =>
-            status === -1 ? "未审核" : status == 0 ? "未通过" : "已通过"
+          title: '状态',
+          dataIndex: 'passed',
+          width: '100px',
+          scopedSlots: { customRender: 'status' }
         },
         {
-          title: "PDF文件",
-          dataIndex: "pdfUrl",
-          width: "5%",
-          scopedSlots: { customRender: "pdfUrl" }
+          title: 'PDF文件',
+          dataIndex: 'pdfUrl',
+          width: '5%',
+          scopedSlots: { customRender: 'pdfUrl' }
         },
         {
-          title: "PDF页码",
-          dataIndex: "pdfNo",
-          width: "100px"
+          title: 'PDF页码',
+          dataIndex: 'pdfNo',
+          width: '100px'
         },
         {
-          title: "审核日期",
-          dataIndex: "verDate",
-          width: "120px"
+          title: '审核日期',
+          dataIndex: 'verDate',
+          width: '120px'
         },
         {
-          title: "操作",
-          dataIndex: "action",
-          width: "100px",
-          scopedSlots: { customRender: "action" }
+          title: '操作',
+          dataIndex: 'action',
+          width: '100px',
+          scopedSlots: { customRender: 'action' }
         }
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        console.log("loadData.parameter", parameter);
-        Object.assign(this.queryParam, parameter);
+        console.log('loadData.parameter', parameter)
+        Object.assign(this.queryParam, parameter)
         return listEntities(this.queryParam).then(res => {
-          return res.result;
+          return res.result
         });
       }
     };
+  },
+  filters: {
+    statusFilter (type) {
+      return statusMap[type].text
+    },
+    statusTypeFilter (type) {
+      return statusMap[type].status
+    }
   },
   created() {
     // getRoleList({ t: new Date() });
   },
   methods: {
     handleModify(record) {
-      this.$refs.entityModifyModal.edit(record);
+      this.$refs.entityModifyModal.edit(record)
     },
     handleOk() {
-      this.$refs.table.refresh();
+      this.$refs.table.refresh()
     }
   }
-};
+}
 </script>

@@ -26,8 +26,8 @@
             :value="reflect.relationId">{{ reflect.relationName }}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="审核意见" ：labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="['description']"/>
+        <a-form-item label="审核意见" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-auto-complete v-decorator="['description']" @select="onSelect" @search="handleSearch" :dataSource="opinionSources"/>
         </a-form-item>
         <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { dealRelation } from '@/api/verify'
+import { dealRelation, prefixOpinion } from '@/api/verify'
 
 export default {
   data() {
@@ -60,55 +60,73 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-      mdl: {}
-    };
+      mdl: {},
+      opinionSources: [],
+    }
   },
   methods: {
     add() {
-      this.visible = true;
+      this.visible = true
     },
     edit(record) {
-      this.visible = true;
-      this.mdl = Object.assign({}, record);
+      this.visible = true
+      this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
-        this.form.setFieldsValue({ ...record });
-      });
+        this.form.setFieldsValue({ ...record })
+      })
     },
     handleSubmit() {
       const {
         form: { validateFields }
-      } = this;
+      } = this
       const validateFieldsKey = ['content', 'relationId', 'description', 'passed']
-      this.confirmLoading = true;
+      this.confirmLoading = true
 
       validateFields((errors, values) => {
         if (!errors) {
-          console.log("values", values);
+          console.log('values', values)
           const verifyParams = { ...values }
-          verifyParams.statId = this.mdl.stateId;
-          verifyParams.id = this.mdl.id;
+          verifyParams.statId = this.mdl.stateId
+          verifyParams.id = this.mdl.id
           dealRelation(verifyParams)
           .then((res)=>{
-            this.visible = false;
-            this.confirmLoading = false;
-            this.$emit("ok", values);
+            this.visible = false
+            this.confirmLoading = false
+            this.$emit('ok', values)
           })
           .catch((err)=>{
-            this.confirmLoading = false;
+            this.confirmLoading = false
           })
           // setTimeout(() => {
-          //   this.visible = false;
-          //   this.confirmLoading = false;
-          //   this.$emit("ok", values);
-          // }, 1500);
+          //   this.visible = false
+          //   this.confirmLoading = false
+          //   this.$emit('ok', values)
+          // }, 1500)
         } else {
-          this.confirmLoading = false;
+          this.confirmLoading = false
         }
-      });
+      })
     },
     handleCancel() {
-      this.visible = false;
+      this.visible = false
+    },
+    handleSearch (value) {
+      // this.opinionSources = !value?[]:[
+      //   value,
+      //   value + value,
+      //   value + value + value
+      // ]
+      prefixOpinion({ prefix: value })
+      .then((res) => {
+        this.opinionSources = res.result
+      })
+      .catch(err => {
+        this.opinionSources = []
+      })
+    },
+    onSelect (value) {
+        console.log(value)
     }
   }
-};
+}
 </script>

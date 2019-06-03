@@ -2,7 +2,7 @@
   <a-modal
     title="标注审核"
     :width="840"
-    :visible="visible"
+    v-model="visible"
     :confirmLoading="confirmLoading"
     @ok="handleSubmit"
     @cancel="handleCancel"
@@ -19,8 +19,8 @@
           <a-input v-if="mdl.type === 0" disabled value="实体标注"/>
           <a-input v-if="mdl.type === 1" disabled value="关系标注"/>
         </a-form-item>
-        <a-form-item label="审核意见" labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="['description']"/>
+        <a-form-item label="审核意见" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-auto-complete v-decorator="['description']" @select="onSelect" @search="handleSearch" :dataSource="opinionSources"/>
         </a-form-item>
         <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
@@ -38,10 +38,10 @@
 </template>
 
 <script>
-import {dealEntity} from '@/api/verify'
+import { dealEntity, prefixOpinion } from '@/api/verify'
 
 export default {
-  data() {
+  data () {
     return {
       labelCol: {
         xs: { span: 24 },
@@ -54,54 +54,72 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-      mdl: {}
-    };
+      mdl: {},
+      opinionSources: [],
+    }
   },
   methods: {
-    add() {
-      this.visible = true;
+    add () {
+      this.visible = true
     },
-    edit(record) {
-      this.visible = true;
-      this.mdl = Object.assign({}, record);
+    edit (record) {
+      this.visible = true
+      this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
-        this.form.setFieldsValue({ ...record });
-      });
+        this.form.setFieldsValue({ ...record })
+      })
     },
-    handleSubmit() {
+    handleSubmit () {
       const {
         form: { validateFields }
-      } = this;
+      } = this
       const validateFieldsKey = ['content', 'description', 'passed']
-      this.confirmLoading = true;
-      validateFields(validateFieldsKey, {force: true}, (errors, values) => {
+      this.confirmLoading = true
+      validateFields(validateFieldsKey, { force: true }, (errors, values) => {
         if (!errors) {
-          console.log("values", values);
+          console.log('values', values)
           const verifyParams = { ...values }
           verifyParams.statId = this.mdl.stateId
           verifyParams.id = this.mdl.id
           dealEntity(verifyParams)
-          .then((res)=>{
-            this.visible = false
-            this.confirmLoading = false
-            this.$emit("ok", values)
-          })
-          .catch((err)=>{
-            this.confirmLoading = false
-          })
+            .then((res) => {
+              this.visible = false
+              this.confirmLoading = false
+              this.$emit('ok', values)
+            })
+            .catch(err => {
+              this.confirmLoading = false
+            })
           // setTimeout(() => {
-          //   this.visible = false;
-          //   this.confirmLoading = false;
-          //   this.$emit("ok", values);
-          // }, 1500);
+          //   this.visible = false
+          //   this.confirmLoading = false
+          //   this.$emit('ok', values)
+          // }, 1500)
         } else {
           this.confirmLoading = false
         }
-      });
+      })
     },
-    handleCancel() {
-      this.visible = false;
+    handleCancel () {
+      this.visible = false
+    },
+    handleSearch (value) {
+      // this.opinionSources = !value?[]:[
+      //   value,
+      //   value + value,
+      //   value + value + value
+      // ]
+      prefixOpinion({ prefix: value })
+      .then((res) => {
+        this.opinionSources = res.result
+      })
+      .catch(err => {
+        this.opinionSources = []
+      })
+    },
+    onSelect (value) {
+        console.log(value)
     }
   }
-};
+}
 </script>

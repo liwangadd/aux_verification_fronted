@@ -23,9 +23,12 @@
       rowKey="id"
       :columns="columns"
       :data="loadData"
+      :showSizeChanger="false"
       :pageSize="100"
-      :showPagination="false"
     >
+      <span slot="status" slot-scope="text">
+        <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+      </span>
       <span slot="action" slot-scope="text, record">
         <template>
           <a @click="handleEdit(record)">审批</a>
@@ -33,7 +36,7 @@
       </span>
     </s-table>
     <a-button
-      style="margin-top:24px; float: right"
+      style="margin-top:24px float: right"
       size="large"
       type="primary"
       htmlType="submit"
@@ -46,45 +49,45 @@
 </template>
 
 <script>
-import moment from "moment";
-import { STable } from "@/components";
-import VerEntityModal from "./modules/VerEntityModal";
-import VerRelationModal from "./modules/VerRelationModal";
-import { getVerifyContents, openNextStatement } from "@/api/verify";
+// import moment from 'moment'
+import { STable } from '@/components'
+import VerEntityModal from './modules/VerEntityModal'
+import VerRelationModal from './modules/VerRelationModal'
+import { getVerifyContents, openNextStatement } from '@/api/verify'
 
 const statusMap = {
+  // 0: {
+  //   status: 'default',
+  //   text: '关闭'
+  // },
+  2: {
+    status: 'processing',
+    text: '已通过'
+  },
   0: {
-    status: "default",
-    text: "关闭"
+    status: 'success',
+    text: '未审核'
   },
   1: {
-    status: "processing",
-    text: "运行中"
-  },
-  2: {
-    status: "success",
-    text: "已上线"
-  },
-  3: {
-    status: "error",
-    text: "异常"
+    status: 'error',
+    text: '未通过'
   }
-};
+}
 
 export default {
-  name: "TableList",
+  name: 'TableList',
   components: {
     STable,
     VerEntityModal,
     VerRelationModal
   },
-  data() {
+  data () {
     return {
       mdl: {},
       // 查询参数
       queryParam: {},
 
-      pdfUrl: "",
+      pdfUrl: '',
 
       pdfNo: -1,
 
@@ -92,82 +95,91 @@ export default {
       // 表头
       columns: [
         {
-          title: "标注类型",
-          dataIndex: "type",
-          width: "100px",
-          customRender: status => (status === 0 ? "实体标注" : "关系标注")
+          title: '标注类型',
+          dataIndex: 'type',
+          width: '100px',
+          customRender: status => (status === 0 ? '实体标注' : '关系标注')
         },
         {
-          title: "文本内容",
-          dataIndex: "content"
+          title: '文本内容',
+          dataIndex: 'content'
         },
         {
-          title: "状态",
-          dataIndex: "passed",
-          width: "100px",
-          customRender: status =>
-            status === -1 ? "未审核" : status === 0 ? "未通过" : "已通过"
+          title: '状态',
+          dataIndex: 'passed',
+          width: '100px',
+          // customRender: status =>
+          //   status === -1 ? '未审核' : status === 0 ? '未通过' : '已通过'
+          scopedSlots: { customRender: 'status' }
         },
         {
-          title: "操作",
-          dataIndex: "action",
-          width: "150px",
-          scopedSlots: { customRender: "action" }
+          title: '操作',
+          dataIndex: 'action',
+          width: '150px',
+          scopedSlots: { customRender: 'action' }
         }
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        console.log("loadData.parameter", parameter);
-        Object.assign(this.queryParam, parameter);
+        console.log('loadData.parameter', parameter)
+        Object.assign(this.queryParam, parameter)
         return getVerifyContents(this.queryParam).then(res => {
-          this.pdfUrl = res.result.pdfUrl;
-          this.pdfNo = res.result.pdfNo;
-          this.contents = res.result.data;
-          return res.result;
-        });
+          this.pdfUrl = res.result.pdfUrl
+          this.pdfNo = res.result.pdfNo
+          this.contents = res.result.data
+          return res.result
+        })
       }
-    };
+    }
   },
-  created() {
-    // getRoleList({ t: new Date() });
-    this.getNextStatement({completeLast:false});
+  created () {
+    // getRoleList({ t: new Date() })
+    this.getNextStatement({completeLast:false})
+  },
+  filters: {
+    statusFilter (type) {
+      return statusMap[type + 1].text
+    },
+    statusTypeFilter (type) {
+      return statusMap[type + 1].status
+    }
   },
   methods: {
     handleEdit(record) {
-      console.log(record);
+      console.log(record)
       if (record.type === 0) {
-        this.$refs.verEntityModal.edit(record);
+        this.$refs.verEntityModal.edit(record)
       } else {
-        this.$refs.verRelationModal.edit(record);
+        this.$refs.verRelationModal.edit(record)
       }
     },
-    handleOk() {
-      this.$refs.table.refresh();
+    handleOk () {
+      this.$refs.table.refresh()
     },
     getNextStatement(parameter) {
       for (let i = 0; i < this.contents.length; ++i) {
         if (this.contents[i].passed === -1) {
-          this.$notification["warn"]({
-            message: "通知",
-            description: "还有文本没有审核",
+          this.$notification['warn']({
+            message: '通知',
+            description: '还有文本没有审核',
             duration: 1
-          });
-          return;
+          })
+          return
         }
       }
       openNextStatement(parameter)
         .then(res => {
-          console.log("初始化获取审核文本");
+          console.log('初始化获取审核文本')
           this.handleOk()
         })
         .catch(err => {
-          this.$notification["info"]({
-            message: "通知",
-            description: "没有需要审核的文本",
+          this.$notification['info']({
+            message: '通知',
+            description: '没有需要审核的文本',
             duration: 1
-          });
-        });
+          })
+        })
     }
   }
-};
+}
 </script>

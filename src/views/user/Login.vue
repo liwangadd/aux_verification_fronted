@@ -75,7 +75,7 @@
         <!-- <router-link
           :to="{ name: 'recover', params: { user: 'aaa'} }"
           class="forge-password"
-          style="float: right;"
+          style="float: right"
         >忘记密码</router-link> -->
       <!-- </a-form-item> -->
 
@@ -271,17 +271,17 @@ export default {
 <style lang="less" scoped>
 .user-layout-login {
   label {
-    font-size: 14px;
+    font-size: 14px
   }
 
   .getCaptcha {
     display: block;
     width: 100%;
-    height: 40px;
+    height: 40px
   }
 
   .forge-password {
-    font-size: 14px;
+    font-size: 14px
   }
 
   button.login-button {

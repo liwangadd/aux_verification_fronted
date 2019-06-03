@@ -15,7 +15,7 @@
           <p>{{ mdl.pdfNo }}</p>
         </a-form-item>
         <a-form-item label="审核意见" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="['description']"/>
+          <a-auto-complete v-decorator="['description']" @select="onSelect" @search="handleSearch" :dataSource="opinionSources"/>
         </a-form-item>
         <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { dealEntity } from '@/api/verify'
+import { dealEntity, prefixOpinion } from '@/api/verify'
 
 export default {
   data() {
@@ -49,15 +49,16 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-      mdl: {}
-    };
+      mdl: {},
+      opinionSources: [],
+    }
   },
   methods: {
     edit(record) {
       this.visible = true;
-      this.mdl = Object.assign({}, record);
+      this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
-        this.form.setFieldsValue({ ...record });
+        this.form.setFieldsValue({ ...record })
       });
     },
     handleSubmit() {
@@ -68,26 +69,43 @@ export default {
       this.confirmLoading = true;
       validateFields((errors, values) => {
         if (!errors) {
-          console.log("values", values);
+          console.log('values', values)
           const verifyParams = { ...values }
-          verifyParams.statId = this.mdl.statId;
-          verifyParams.id = this.mdl.id;
+          verifyParams.statId = this.mdl.statId
+          verifyParams.id = this.mdl.id
           dealEntity(verifyParams)
           .then((res)=>{
-            this.visible = false;
-            this.confirmLoading = false;
-            this.$emit("ok", values);
+            this.visible = false
+            this.confirmLoading = false
+            this.$emit('ok', values)
           })
           .catch((err)=>{
-            this.confirmLoading = false;
-          });
+            this.confirmLoading = false
+          })
         } else {
-          this.confirmLoading = false;
+          this.confirmLoading = false
         }
-      });
+      })
     },
     handleCancel() {
-      this.visible = false;
+      this.visible = false
+    },
+    handleSearch (value) {
+      // this.opinionSources = !value?[]:[
+      //   value,
+      //   value + value,
+      //   value + value + value
+      // ]
+      prefixOpinion({ prefix: value })
+      .then((res) => {
+        this.opinionSources = res.result
+      })
+      .catch(err => {
+        this.opinionSources = []
+      })
+    },
+    onSelect (value) {
+        console.log(value)
     }
   }
 };

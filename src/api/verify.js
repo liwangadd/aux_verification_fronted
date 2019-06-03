@@ -31,3 +31,11 @@ export function dealRelation (parameter) {
     data: parameter
   })
 }
+
+export function prefixOpinion (parameter) {
+  return axios({
+    url: '/ver/opinion/prefix',
+    method: 'post',
+    data: parameter
+  })
+}

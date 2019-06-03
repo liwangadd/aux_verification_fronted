@@ -23,7 +23,7 @@
               :showInfo="false"
               :strokeColor=" passwordLevelColor "
             />
-            <div style="margin-top: 10px;">
+            <div style="margin-top: 10px">
               <span>请至少输入 6 个字符。请不要使用容易被猜到的密码。</span>
             </div>
           </div>
@@ -100,35 +100,34 @@
 </template>
 
 <script>
-import { mixinDevice } from "@/utils/mixin.js";
-import { getSmsCaptcha } from "@/api/login";
-import { register } from "@/api/login";
-import { setTimeout } from "timers";
-import { stat } from "fs";
+import { mixinDevice } from '@/utils/mixin.js'
+import { getSmsCaptcha, register } from '@/api/login'
+import { setTimeout } from 'timers'
+// import { stat } from 'fs'
 
 const levelNames = {
-  0: "低",
-  1: "低",
-  2: "中",
-  3: "强"
-};
+  0: '低',
+  1: '低',
+  2: '中',
+  3: '强'
+}
 const levelClass = {
-  0: "error",
-  1: "error",
-  2: "warning",
-  3: "success"
-};
+  0: 'error',
+  1: 'error',
+  2: 'warning',
+  3: 'success'
+}
 const levelColor = {
-  0: "#ff0000",
-  1: "#ff0000",
-  2: "#ff7e05",
-  3: "#52c41a"
-};
+  0: '#ff0000',
+  1: '#ff0000',
+  2: '#ff7e05',
+  3: '#52c41a'
+}
 export default {
-  name: "Register",
+  name: 'Register',
   components: {},
   mixins: [mixinDevice],
-  data() {
+  data () {
     return {
       form: this.$form.createForm(this),
 
@@ -138,107 +137,107 @@ export default {
         passwordLevel: 0,
         passwordLevelChecked: false,
         percent: 10,
-        progressColor: "#FF0000",
+        progressColor: '#FF0000',
         registerBtn: false
       },
       registerBtn: false
-    };
+    }
   },
   computed: {
-    passwordLevelClass() {
-      return levelClass[this.state.passwordLevel];
+    passwordLevelClass () {
+      return levelClass[this.state.passwordLevel]
     },
-    passwordLevelName() {
-      return levelNames[this.state.passwordLevel];
+    passwordLevelName () {
+      return levelNames[this.state.passwordLevel]
     },
-    passwordLevelColor() {
-      return levelColor[this.state.passwordLevel];
+    passwordLevelColor () {
+      return levelColor[this.state.passwordLevel]
     }
   },
   methods: {
-    handlePasswordLevel(rule, value, callback) {
-      let level = 0;
+    handlePasswordLevel (rule, value, callback) {
+      let level = 0
 
       // 判断这个字符串中有没有数字
       if (/[0-9]/.test(value)) {
-        level++;
+        level++
       }
       // 判断字符串中有没有字母
       if (/[a-zA-Z]/.test(value)) {
-        level++;
+        level++
       }
       // 判断字符串中有没有特殊符号
       if (/[^0-9a-zA-Z_]/.test(value)) {
-        level++;
+        level++
       }
-      this.state.passwordLevel = level;
-      this.state.percent = level * 30;
+      this.state.passwordLevel = level
+      this.state.percent = level * 30
       if (level >= 2) {
         if (level >= 3) {
-          this.state.percent = 100;
+          this.state.percent = 100
         }
-        callback();
+        callback()
       } else {
         if (level === 0) {
-          this.state.percent = 10;
+          this.state.percent = 10
         }
-        callback(new Error("密码强度不够"));
+        callback(new Error('密码强度不够'))
       }
     },
 
-    handlePasswordCheck(rule, value, callback) {
-      const password = this.form.getFieldValue("password");
-      console.log("value", value);
+    handlePasswordCheck (rule, value, callback) {
+      const password = this.form.getFieldValue('password')
+      console.log('value', value)
       if (value === undefined) {
-        callback(new Error("请输入密码"));
+        callback(new Error('请输入密码'))
       }
       if (value && password && value.trim() !== password.trim()) {
-        callback(new Error("两次密码不一致"));
+        callback(new Error('两次密码不一致'))
       }
-      callback();
+      callback()
     },
 
-    handlePhoneCheck(rule, value, callback) {
-      console.log("handlePhoneCheck, rule:", rule);
-      console.log("handlePhoneCheck, value", value);
-      console.log("handlePhoneCheck, callback", callback);
+    handlePhoneCheck (rule, value, callback) {
+      console.log('handlePhoneCheck, rule:', rule)
+      console.log('handlePhoneCheck, value', value)
+      console.log('handlePhoneCheck, callback', callback)
 
-      callback();
+      callback()
     },
 
-    handlePasswordInputClick() {
+    handlePasswordInputClick () {
       if (!this.isMobile()) {
-        this.state.passwordLevelChecked = true;
-        return;
+        this.state.passwordLevelChecked = true
+        return
       }
-      this.state.passwordLevelChecked = false;
+      this.state.passwordLevelChecked = false
     },
 
-    handleSubmit(e) {
-      e.preventDefault();
+    handleSubmit (e) {
+      e.preventDefault()
       const {
         form: { validateFields },
         state
-      } = this;
-      state.registerBtn = true;
+      } = this
+      state.registerBtn = true
       // const { form: { validateFields }, $router } = this
-      const validateFieldsKey = ["email", "password", "password2"];
+      const validateFieldsKey = ['email', 'password', 'password2']
       validateFields(validateFieldsKey, { force: true }, (err, values) => {
         if (!err) {
-          console.log("register from", values);
-          const loginParams = { ...values };
+          console.log('register from', values)
+          const loginParams = { ...values }
           register(loginParams)
-          .then(response=>this.registerSuccess(response))
-          .catch(error=>this.registerFail(error))
-          .finally(()=>{
-            state.registerBtn = false
-          })
+            .then(response => this.registerSuccess(response))
+            .catch(error => this.registerFail(error))
+            .finally(() => {
+              state.registerBtn = false
+            })
         } else {
           setTimeout(() => {
-            state.registerBtn = false;
-          }, 600);
+            state.registerBtn = false
+          }, 600)
         }
-      });
+      })
 
       // validateFields({ force: true }, (err, values) => {
       //   if (!err) {
@@ -247,57 +246,57 @@ export default {
       // })
     },
 
-    getCaptcha(e) {
-      e.preventDefault();
+    getCaptcha (e) {
+      e.preventDefault()
       const {
         form: { validateFields },
         state,
         $message,
         $notification
-      } = this;
+      } = this
 
-      validateFields(["mobile"], { force: true }, (err, values) => {
+      validateFields(['mobile'], { force: true }, (err, values) => {
         if (!err) {
-          state.smsSendBtn = true;
+          state.smsSendBtn = true
 
           const interval = window.setInterval(() => {
             if (state.time-- <= 0) {
-              state.time = 60;
-              state.smsSendBtn = false;
-              window.clearInterval(interval);
+              state.time = 60
+              state.smsSendBtn = false
+              window.clearInterval(interval)
             }
-          }, 1000);
+          }, 1000)
 
-          const hide = $message.loading("验证码发送中..", 0);
+          const hide = $message.loading('验证码发送中..', 0)
 
           getSmsCaptcha({ mobile: values.mobile })
             .then(res => {
-              setTimeout(hide, 2500);
-              $notification["success"]({
-                message: "提示",
+              setTimeout(hide, 2500)
+              $notification['success']({
+                message: '提示',
                 description:
-                  "验证码获取成功，您的验证码为：" + res.result.captcha,
+                  '验证码获取成功，您的验证码为：' + res.result.captcha,
                 duration: 8
-              });
+              })
             })
             .catch(err => {
-              setTimeout(hide, 1);
-              clearInterval(interval);
-              state.time = 60;
-              state.smsSendBtn = false;
-              this.requestFailed(err);
-            });
+              setTimeout(hide, 1)
+              clearInterval(interval)
+              state.time = 60
+              state.smsSendBtn = false
+              this.requestFailed(err)
+            })
         }
-      });
+      })
     },
 
-    registerSuccess(res){
+    registerSuccess (res) {
       console.log(res)
       this.passwordLevelChecked = false
-      this.$router.push({name: 'login'})
+      this.$router.push({ name: 'login' })
     },
 
-    registerFail (err){
+    registerFail (err) {
       this.$notification['error']({
         message: '错误',
         description: ((err.response || {}).data || {}).message || '请求出现错误，请稍后再试',
@@ -305,42 +304,42 @@ export default {
       })
     },
 
-    requestFailed(err) {
-      this.$notification["error"]({
-        message: "错误",
+    requestFailed (err) {
+      this.$notification['error']({
+        message: '错误',
         description:
           ((err.response || {}).data || {}).message ||
-          "请求出现错误，请稍后再试",
+          '请求出现错误，请稍后再试',
         duration: 4
-      });
-      this.registerBtn = false;
+      })
+      this.registerBtn = false
     }
   },
   watch: {
-    "state.passwordLevel"(val) {
-      console.log(val);
+    'state.passwordLevel' (val) {
+      console.log(val)
     }
   }
-};
+}
 </script>
 <style lang="less">
 .user-register {
   &.error {
-    color: #ff0000;
+    color: #ff0000
   }
 
   &.warning {
-    color: #ff7e05;
+    color: #ff7e05
   }
 
   &.success {
-    color: #52c41a;
+    color: #52c41a
   }
 }
 
 .user-layout-register {
   .ant-input-group-addon:first-child {
-    background-color: #fff;
+    background-color: #fff
   }
 }
 </style>
@@ -348,7 +347,7 @@ export default {
 .user-layout-register {
   & > h3 {
     font-size: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 20px
   }
 
   .getCaptcha {
