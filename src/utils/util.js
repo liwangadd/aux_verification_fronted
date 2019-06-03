@@ -1,3 +1,9 @@
+import moment from 'moment'
+
+export function timeFormat (time) {
+  return moment(time).format('YYYY-MM-DD')
+}
+
 export function timeFix () {
   const time = new Date()
   const hour = time.getHours()

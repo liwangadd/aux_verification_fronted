@@ -27,6 +27,7 @@ import moment from "moment";
 import { STable } from "@/components";
 import RelationModifyModal from "./modules/RelationModifyModal";
 import { listRelations } from "@/api/user"
+import { timeFormat } from '@/utils/util'
 
 const statusMap = {
   // 0: {
@@ -88,7 +89,8 @@ export default {
         {
           title: '审核日期',
           dataIndex: 'verDate',
-          width:'120px'
+          width:'120px',
+          customRender: (text) => timeFormat(text)
         },
         {
           title: '操作',
