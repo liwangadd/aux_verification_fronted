@@ -14,13 +14,26 @@
             v-decorator="['content', {rules: [{required: true, message: '文本内容不能为空'}]}]"
             :autosize="{minRows:2,maxRows:6}"
           />
+          <a-row>
+            <a-col :span="24">
+              <a-button type="primary">Primary</a-button>
+              <a-button type="primary">Primary</a-button>
+              <a-button type="primary">Primary</a-button>
+              <a-button type="primary">Primary</a-button>
+            </a-col>
+          </a-row>
         </a-form-item>
         <a-form-item label="标注类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-if="mdl.type === 0" disabled value="实体标注"/>
           <a-input v-if="mdl.type === 1" disabled value="关系标注"/>
         </a-form-item>
         <a-form-item label="审核意见" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-auto-complete v-decorator="['description']" @select="onSelect" @search="handleSearch" :dataSource="opinionSources"/>
+          <a-auto-complete
+            v-decorator="['description']"
+            @select="onSelect"
+            @search="handleSearch"
+            :dataSource="opinionSources"
+          />
         </a-form-item>
         <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
@@ -41,7 +54,7 @@
 import { dealEntity, prefixOpinion } from '@/api/verify'
 
 export default {
-  data () {
+  data() {
     return {
       labelCol: {
         xs: { span: 24 },
@@ -55,21 +68,21 @@ export default {
       confirmLoading: false,
       form: this.$form.createForm(this),
       mdl: {},
-      opinionSources: [],
+      opinionSources: []
     }
   },
   methods: {
-    add () {
+    add() {
       this.visible = true
     },
-    edit (record) {
+    edit(record) {
       this.visible = true
       this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
         this.form.setFieldsValue({ ...record })
       })
     },
-    handleSubmit () {
+    handleSubmit() {
       const {
         form: { validateFields }
       } = this
@@ -82,7 +95,7 @@ export default {
           verifyParams.statId = this.mdl.stateId
           verifyParams.id = this.mdl.id
           dealEntity(verifyParams)
-            .then((res) => {
+            .then(res => {
               this.visible = false
               this.confirmLoading = false
               this.$emit('ok', values)
@@ -100,25 +113,25 @@ export default {
         }
       })
     },
-    handleCancel () {
+    handleCancel() {
       this.visible = false
     },
-    handleSearch (value) {
+    handleSearch(value) {
       // this.opinionSources = !value?[]:[
       //   value,
       //   value + value,
       //   value + value + value
       // ]
       prefixOpinion({ prefix: value })
-      .then((res) => {
-        this.opinionSources = res.result
-      })
-      .catch(err => {
-        this.opinionSources = []
-      })
+        .then(res => {
+          this.opinionSources = res.result
+        })
+        .catch(err => {
+          this.opinionSources = []
+        })
     },
-    onSelect (value) {
-        console.log(value)
+    onSelect(value) {
+      console.log(value)
     }
   }
 }

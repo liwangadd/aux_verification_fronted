@@ -14,6 +14,14 @@
             v-decorator="['content', {rules: [{required: true, message: '文本内容不能为空'}]}]"
             :autosize="{minRows:2,maxRows:6}"
           />
+          <a-row>
+            <a-col :span="24">
+              <a-button type="primary">Primary</a-button>
+              <a-button type="primary">Primary</a-button>
+              <a-button type="primary">Primary</a-button>
+              <a-button type="primary">Primary</a-button>
+            </a-col>
+          </a-row>
         </a-form-item>
         <a-form-item label="标注类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-if="mdl.type === 0" disabled value="实体标注"/>
