@@ -59,7 +59,7 @@
 import { STable } from '@/components'
 import VerEntityModal from './modules/VerEntityModal'
 import VerRelationModal from './modules/VerRelationModal'
-import { getVerifyContents, openNextStatement } from '@/api/verify'
+import { getEntityLabels, getVerifyContents, openNextStatement } from '@/api/verify'
 
 const statusMap = {
   // 0: {
@@ -89,6 +89,8 @@ export default {
   },
   data () {
     return {
+      // 实体标注按钮
+      EntityButtonList: [],
       mdl: {},
       // 查询参数
       queryParam: {},
@@ -152,7 +154,7 @@ export default {
   },
   methods: {
     handleEdit(record) {
-      console.log(record)
+      record["buttonList"] = this.$data.EntityButtonList
       if (record.type === 0) {
         this.$refs.verEntityModal.edit(record)
       } else {
@@ -182,6 +184,19 @@ export default {
           this.$notification['info']({
             message: '通知',
             description: '没有需要审核的文本',
+            duration: 1
+          })
+        })
+
+      // 获取实体按钮
+      getEntityLabels()
+        .then(res => {
+          this.$data.EntityButtonList = res.result.entityList
+        })
+        .catch(err => {
+          this.$notification['error']({
+            message: '错误',
+            description: '获取实体按钮错误' + err,
             duration: 1
           })
         })

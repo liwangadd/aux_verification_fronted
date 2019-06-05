@@ -10,11 +10,12 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form" @submit="handleSubmit">
         <a-form-item label="文本内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-textarea
+          <a-textarea 
+            ref="contextarea"
             v-decorator="['content', {rules: [{required: true, message: '文本内容不能为空'}]}]"
             :autosize="{minRows:2,maxRows:6}"
           />
-          <EntityButtons :buttonList="buttonList" :content="this.form.getFieldValue('content')" 
+          <EntityButtons :buttonList="buttonList" :inObj="this.$refs.contextarea"
                   @addEntity="handleAddEntity"/>
         </a-form-item>
         <a-form-item label="标注类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -79,7 +80,8 @@ export default {
           "value": "</sum>",
           "color": "#98cf0a"
         },
-      ]
+      ],
+      textareaObj: "",
     }
   },
   methods: {
@@ -88,6 +90,7 @@ export default {
     },
     edit(record) {
       this.visible = true
+      this.buttonList = record.buttonList
       this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
         this.form.setFieldsValue({ ...record })

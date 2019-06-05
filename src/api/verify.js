@@ -8,6 +8,13 @@ export function getVerifyContents (parameter) {
   })
 }
 
+export function getEntityLabels () {
+  return axios({
+    url: '/ver/util/entiReflect',
+    method: 'get',
+  })
+}
+
 export function dealEntity (parameter) {
   return axios({
     url: '/ver/entity',
