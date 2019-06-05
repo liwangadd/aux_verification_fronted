@@ -48,6 +48,12 @@
   </a-card>
 </template>
 
+<style>
+.button-row button{
+  margin-right: 5px
+}
+</style>
+
 <script>
 // import moment from 'moment'
 import { STable } from '@/components'

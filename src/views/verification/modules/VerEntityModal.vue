@@ -14,14 +14,9 @@
             v-decorator="['content', {rules: [{required: true, message: '文本内容不能为空'}]}]"
             :autosize="{minRows:2,maxRows:6}"
           />
-          <a-row>
-            <a-col :span="24">
-              <a-button type="primary">Primary</a-button>
-              <a-button type="primary">Primary</a-button>
-              <a-button type="primary">Primary</a-button>
-              <a-button type="primary">Primary</a-button>
-            </a-col>
-          </a-row>
+          <!-- 实体插入 button -->
+          <EntityButtons :buttonList="buttonList" :content="this.form.getFieldValue('content')" 
+                  @addEntity="handleAddEntity"/>
         </a-form-item>
         <a-form-item label="标注类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-if="mdl.type === 0" disabled value="实体标注"/>
@@ -52,8 +47,12 @@
 
 <script>
 import { dealEntity, prefixOpinion } from '@/api/verify'
+import EntityButtons from './EntityButtons.vue'
 
 export default {
+  components:{
+    EntityButtons,
+  },
   data() {
     return {
       labelCol: {
@@ -68,7 +67,8 @@ export default {
       confirmLoading: false,
       form: this.$form.createForm(this),
       mdl: {},
-      opinionSources: []
+      opinionSources: [],
+      buttonList: [],
     }
   },
   methods: {
@@ -130,9 +130,13 @@ export default {
           this.opinionSources = []
         })
     },
+    handleAddEntity(content) {
+      this.form.setFieldsValue({"content":content})
+    },
     onSelect(value) {
       console.log(value)
-    }
+    },
+
   }
 }
 </script>
