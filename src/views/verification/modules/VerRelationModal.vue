@@ -69,19 +69,7 @@ export default {
       form: this.$form.createForm(this),
       mdl: {},
       opinionSources: [],
-      buttonList:[
-        {
-          "name":"公司名",
-          "value": "</org>",
-          "color": "#66ccff"
-        },
-        {
-          "name":"数字",
-          "value": "</sum>",
-          "color": "#98cf0a"
-        },
-      ],
-      textareaObj: "",
+      buttonList:[],
     }
   },
   methods: {
@@ -94,6 +82,9 @@ export default {
       this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
         this.form.setFieldsValue({ ...record })
+        if (record.passed === -1){
+          this.form.setFieldsValue({passed: undefined})
+        }
       })
     },
     handleSubmit() {

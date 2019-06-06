@@ -35,7 +35,7 @@
           <a-select
             v-decorator="['passed', {rules: [{required:true}]}]"
             placeholder="请选择"
-            initialValue="1"
+            defaultValue="1"
           >
             <a-select-option :value="1">通过</a-select-option>
             <a-select-option :value="0">拒绝</a-select-option>
@@ -82,6 +82,9 @@ export default {
       this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
         this.form.setFieldsValue({ ...record })
+        if (record.passed === -1){
+          this.form.setFieldsValue({passed: undefined})
+        }
       })
     },
     handleSubmit() {
