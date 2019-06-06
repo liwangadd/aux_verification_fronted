@@ -28,6 +28,7 @@ import { STable } from "@/components";
 import EntityModifyModal from "./modules/EntityModifyModal";
 import { listEntities } from "@/api/user";
 import { timeFormat } from '@/utils/util'
+import {getEntityLabels} from "@/api/verify"
 
 const statusMap = {
   // 0: {
@@ -56,6 +57,8 @@ export default {
   },
   data() {
     return {
+      // 实体标注按钮
+      EntityButtonList: [],
       mdl: {},
       queryParam: {},
       //表头
@@ -114,9 +117,22 @@ export default {
   },
   created() {
     // getRoleList({ t: new Date() });
+    // 获取实体按钮
+    getEntityLabels()
+      .then(res => {
+        this.$data.EntityButtonList = res.result.entityList
+      })
+      .catch(err => {
+        this.$notification['error']({
+          message: '错误',
+          description: '获取实体按钮错误' + err,
+          duration: 1
+        })
+      })
   },
   methods: {
     handleModify(record) {
+      record["buttonList"] = this.EntityButtonList
       this.$refs.entityModifyModal.edit(record)
     },
     handleOk() {

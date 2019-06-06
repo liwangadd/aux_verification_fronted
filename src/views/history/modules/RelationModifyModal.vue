@@ -11,9 +11,12 @@
       <a-form :form="form">
         <a-form-item label="文本内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-textarea
+            ref="contextarea"
             v-decorator="['content', {rules: [{required: true, message: '文本内容不能为空'}]}]"
             :autosize="{minRows:2,maxRows:6}"
           />
+          <EntityButtons :buttonList="buttonList" :inObj="this.$refs.contextarea"
+                  @addEntity="handleAddEntity"/>
         </a-form-item>
         <a-form-item label="PDF文件" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a :href="mdl.pdfUrl">{{ mdl.pdfUrl }}</a>
@@ -44,8 +47,12 @@
 
 <script>
 import { dealRelation, prefixOpinion } from '@/api/verify'
+import EntityButtons from '@/custom/components/EntityButtons.vue';
 
 export default {
+  components: {
+    EntityButtons,
+  },
   data() {
     return {
       labelCol: {
@@ -61,6 +68,7 @@ export default {
       form: this.$form.createForm(this),
       mdl: {},
       opinionSources: [],
+      buttonList: [],
     }
   },
   methods: {
@@ -69,6 +77,7 @@ export default {
     },
     edit(record) {
       this.visible = true
+      this.buttonList = record.buttonList
       this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
         this.form.setFieldsValue({ ...record })
@@ -116,6 +125,9 @@ export default {
       .catch(err => {
         this.opinionSources = []
       })
+    },
+    handleAddEntity(content) {
+      this.form.setFieldsValue({"content":content})
     },
     onSelect (value) {
         console.log(value)

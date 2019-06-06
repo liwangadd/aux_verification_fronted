@@ -8,6 +8,12 @@
   </a-row>
 </template>
 
+<style scoped>
+.button-row button{
+  margin-right: 5px;
+}
+</style>
+
 <script>
 export default {
   name: "EntityButtons",
