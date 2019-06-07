@@ -10,7 +10,7 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form" @submit="handleSubmit">
         <a-form-item label="文本内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input
+          <a-textarea
             ref="contextarea"
             v-decorator="['content', {rules: [{required: true, message: '文本内容不能为空'}]}]"
             :autosize="{minRows:2,maxRows:6}"

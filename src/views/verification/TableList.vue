@@ -5,7 +5,7 @@
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
             <a-form-item label="PDF原文">
-              <a :href="pdfUrl">
+              <a target="_blank" :href="'/resource/pdf/' + pdfUrl">
                 <a-button type="primary">查看</a-button>
               </a>
             </a-form-item>

@@ -112,7 +112,7 @@ module.exports = {
         target: 'http://10.109.246.60:8080',
         ws: false,
         changeOrigin: true
-      }
+      },
     }
   },
 
