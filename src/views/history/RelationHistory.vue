@@ -8,7 +8,7 @@
 
         <span slot="pdfUrl" slot-scope="text, record">
             <template>
-                <a :href="record.pdfUrl">{{ record.pdfUrl }}</a>
+              <a target="_blank" :href="'/static/pdf/' + record.pdfUrl + '.pdf'"> {{ record.pdfUrl }}</a>
             </template>
         </span>
 

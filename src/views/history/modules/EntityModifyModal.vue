@@ -12,7 +12,7 @@
                   @addEntity="handleAddEntity"/>
         </a-form-item>
         <a-form-item label="PDF文件" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a :href="mdl.pdfUrl">{{ mdl.pdfUrl }}</a>
+          <a target="_blank" :href="'/static/pdf/' + mdl.pdfUrl + '.pdf'">{{ mdl.pdfUrl }}</a>
         </a-form-item>
         <a-form-item label="PDF页码" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <p>{{ mdl.pdfNo }}</p>
