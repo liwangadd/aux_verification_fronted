@@ -15,8 +15,6 @@
             v-decorator="['content', {rules: [{required: true, message: '文本内容不能为空'}]}]"
             :autosize="{minRows:2,maxRows:6}"
           />
-          <EntityButtons :buttonList="buttonList" :inObj="this.$refs.contextarea"
-                  @addEntity="handleAddEntity"/>
         </a-form-item>
         <a-form-item label="PDF文件" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a target="_blank" :href="'/static/pdf/' + mdl.pdfUrl + '.pdf#page=' + mdl.pdfNo ">{{ mdl.pdfUrl }}</a>

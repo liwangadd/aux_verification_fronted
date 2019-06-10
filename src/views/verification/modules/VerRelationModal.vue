@@ -15,8 +15,6 @@
             v-decorator="['content', {rules: [{required: true, message: '文本内容不能为空'}]}]"
             :autosize="{minRows:2,maxRows:6}"
           />
-          <EntityButtons :buttonList="buttonList" :inObj="this.$refs.contextarea"
-                  @addEntity="handleAddEntity"/>
         </a-form-item>
         <a-form-item label="标注类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-if="mdl.type === 0" disabled value="实体标注"/>
