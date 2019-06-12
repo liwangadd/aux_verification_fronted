@@ -15,3 +15,14 @@ export function listRelations (parameter) {
     data: parameter
   })
 }
+
+// 修改用户名
+export function updateUserName (username) {
+  return axios({
+    url: '/user/info/update',
+    method: 'post',
+    data: {
+      'name': username
+    }
+  })
+}

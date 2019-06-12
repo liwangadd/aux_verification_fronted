@@ -4,7 +4,7 @@
       <a-col :md="24" :lg="16">
         <a-form layout="vertical">
           <a-form-item label="昵称">
-            <a-input placeholder="给自己起个名字"/>
+            <a-input placeholder="给自己起个名字" v-model="username"/>
           </a-form-item>
           <!-- <a-form-item
             label="Bio"
@@ -12,9 +12,9 @@
             <a-textarea rows="4" placeholder="You are not alone."/>
           </a-form-item>-->
 
-          <a-form-item label="电子邮件" :required="false">
+          <!-- <a-form-item label="电子邮件" :required="false">
             <a-input placeholder="exp@admin.com"/>
-          </a-form-item>
+          </a-form-item> -->
           <!-- <a-form-item
             label="加密方式"
             :required="false"
@@ -31,25 +31,24 @@
           >
             <a-input placeholder="h3gSbecd"/>
           </a-form-item>-->
-          <a-form-item label="登录密码" :required="false">
+          <!-- <a-form-item label="登录密码" :required="false">
             <a-input placeholder="密码"/>
-          </a-form-item>
+          </a-form-item> -->
 
           <a-form-item>
-            <a-button type="primary">提交</a-button>
-            <a-button style="margin-left: 8px">保存</a-button>
+            <a-button type="primary" @click="commitForm">提交</a-button>
           </a-form-item>
         </a-form>
       </a-col>
-      <a-col :md="24" :lg="8" :style="{ minHeight: '180px' }">
-        <div class="ant-upload-preview">
+      <!-- <a-col :md="24" :lg="8" :style="{ minHeight: '180px' }">
+        <div class="ant-upload-preview"> -->
           <!-- <a-icon  class="upload-icon"/> -->
           <!-- <div class="mask">
             <a-icon type="plus"/>
           </div> -->
-          <img :src="option.img">
+          <!-- <img :src="option.img">
         </div>
-      </a-col>
+      </a-col> -->
     </a-row>
 
     <avatar-modal ref="modal"></avatar-modal>
@@ -58,6 +57,10 @@
 
 <script>
 import AvatarModal from "./AvatarModal";
+import {updateUserName} from "@/api/user"
+import { setTimeout } from 'timers';
+import { mapActions } from 'vuex';
+import store from '@/store'
 
 export default {
   components: {
@@ -81,10 +84,38 @@ export default {
         // 开启宽度和高度比例
         fixed: true,
         fixedNumber: [1, 1]
-      }
+      },
+      
+      username: null,
     };
   },
-  methods: {}
+  methods: {
+    ...mapActions(["GetInfo"]),
+    // 提交用户名修改
+    commitForm(){
+      updateUserName(this.username)
+      .then(res => {
+        if (res.message === "更新成功"){
+          // 更新信息
+          this.$store.commit('SET_NAME', { name: this.username, welcome: null })
+          this.$notification.success({
+            message: "成功",
+            description: res.message ,
+            duration: 1.5,
+          })
+          this.$router.push({ name: 'verification' })
+        }else{
+          this.$notification.warning({
+            message: "错误",
+            description: res.message,
+            duration: 3,
+          })
+        }
+      })
+
+    },
+
+  }
 };
 </script>
 
