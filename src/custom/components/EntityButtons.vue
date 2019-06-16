@@ -15,6 +15,7 @@
 </style>
 
 <script>
+import { stat } from 'fs';
 export default {
   name: "EntityButtons",
   props: ["buttonList", "content", "inObj"],
@@ -22,6 +23,7 @@ export default {
     // 点击插入
     async insertAtCursor(myValue) {
       const self = this
+      const prefix = "</o>"
       // 获取编辑器
       const myField = this.inObj
       let content = this.inObj.value
@@ -31,8 +33,17 @@ export default {
         var startPos = myField.$el.selectionStart
         var endPos = myField.$el.selectionEnd
         console.log(startPos, endPos)
+
         // 增加焦点
-        content = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length)
+        if (startPos === endPos){ // 没有选中, 直接在尾部加标签
+          content = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length)
+        }else{
+          // 文字被选中，在前后加标签
+          content = myField.value.substring(0, startPos) + prefix 
+                    + myField.value.substring(startPos, endPos)
+                    + myValue + myField.value.substring(endPos, myField.value.length)
+        }
+
 
         // 提交
         this.$emit("addEntity", content)
@@ -40,7 +51,13 @@ export default {
         // 待提交后重获焦点
         await this.$nextTick() // 这句是重点, 圈起来
         myField.focus()
-        myField.$el.setSelectionRange(endPos + myValue.length, endPos + myValue.length)
+
+        // 重获焦点位置
+        if (startPos === endPos){
+          myField.$el.setSelectionRange(endPos + myValue.length, endPos + myValue.length)
+        }else{
+          myField.$el.setSelectionRange(endPos + myValue.length + prefix.length, endPos + myValue.length+ prefix.length)
+        }
       } else {
         console.log("no focus")
         content += myValue
