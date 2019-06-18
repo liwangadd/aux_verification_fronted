@@ -9,6 +9,7 @@
   >
     <a-spin :spinning="confirmLoading">
       <a-form :form="form" @submit="handleSubmit">
+        <!-- 根据传入类型决定 实体/关系 -->
         <a-form-item label="文本内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <div id="contentarea" v-html="mdl.content"></div>
           <!-- 实体插入 button -->
@@ -19,6 +20,8 @@
           <a-input v-if="mdl.type === 0" disabled value="实体标注"/>
           <a-input v-if="mdl.type === 1" disabled value="关系标注"/>
         </a-form-item>
+
+        <!-- pdf 来源，未审核文本不显示 -->
         <a-form-item label="审核意见" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-auto-complete
             v-decorator="['description']"
@@ -27,6 +30,8 @@
             :dataSource="opinionSources"
           />
         </a-form-item>
+
+        <!-- 审核意见部分 -->
         <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
             v-decorator="['passed', {rules: [{required:true}]}]"
@@ -46,6 +51,9 @@ import { dealEntity, prefixOpinion } from '@/api/verify'
 import EntityButtons from '@/custom/components/EntityButtons.vue';
 
 export default {
+  props:{
+
+  },
   components:{
     EntityButtons,
   },
