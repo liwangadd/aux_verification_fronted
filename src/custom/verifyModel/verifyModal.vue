@@ -9,32 +9,33 @@
   >
     <a-spin :spinning="confirmLoading">
       <a-form :form="form" @submit="handleSubmit">
-        <!-- 根据传入类型决定 实体/关系 -->
-        <a-form-item label="文本内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <div id="contentarea" v-html="mdl.content"></div>
-          <!-- 实体插入 button -->
-          <EntityButtons :buttonList="buttonList" :content="mdl.content" :inObj="this.$refs.contextarea"
-                  @addEntity="handleAddEntity"/>
-        </a-form-item>
         <a-form-item label="标注类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-if="mdl.type === 0" disabled value="实体标注"/>
-          <a-input v-if="mdl.type === 1" disabled value="关系标注"/>
+          <a-input v-if="ctx.type === 0" disabled value="实体标注"/>
+          <a-input v-if="ctx.type === 1" disabled value="关系标注"/>
         </a-form-item>
 
+        <!-- 根据传入类型决定 实体/关系 -->
+        <component v-bind:is="ctxComponent"
+                  :content="tempContent"
+                  :ctx="ctx"
+                  @update="updateContent"
+                  :buttonList="entityButtonList" ></component>
+
         <!-- pdf 来源，未审核文本不显示 -->
+        <pdf :pdfNo="ctx.pdfNo" :pdfUrl="ctx.pdfUrl" v-if="ctx.history"/>
+
+        <!-- 审核意见部分 -->
         <a-form-item label="审核意见" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-auto-complete
-            v-decorator="['description']"
-            @select="onSelect"
+            v-decorator="['description', {initialValue: ctx.description}]"
             @search="handleSearch"
             :dataSource="opinionSources"
           />
         </a-form-item>
 
-        <!-- 审核意见部分 -->
         <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
-            v-decorator="['passed', {rules: [{required:true}]}]"
+            v-decorator="['passed', {rules: [{required:true}], initialValue: ctx.passed}]"
             placeholder="请选择"
           >
             <a-select-option :value="1">通过</a-select-option>
@@ -47,65 +48,90 @@
 </template>
 
 <script>
-import { dealEntity, prefixOpinion } from '@/api/verify'
-import EntityButtons from '@/custom/components/EntityButtons.vue';
+import { dealEntity, prefixOpinion, dealRelation } from '@/api/verify'
+import entity from './components/entity/entity.vue'
+import relation from './components/relation/relation.vue'
+import pdf from './components/pdf.vue'
 
 export default {
-  props:{
-
-  },
+  props:[
+    "visible",
+    "example",
+    "entityButtonList",
+  ],
   components:{
-    EntityButtons,
+    entity,
+    relation,
+    pdf
   },
   data() {
     return {
+      // 标签样式
       labelCol: {
         xs: { span: 24 },
         sm: { span: 7 }
       },
+      // 样式
       wrapperCol: {
         xs: { span: 24 },
         sm: { span: 13 }
       },
-      visible: false,
+      // 加载
       confirmLoading: false,
+      // 表单
       form: this.$form.createForm(this),
-      mdl: {},
       opinionSources: [],
-      buttonList: [],
+      tempContent: null,
     }
   },
+
+  computed:{
+    // 传入的上下文
+    ctx() {
+      let res = this.example
+      if (this.example.passed === -1){
+        res.passed = undefined
+      }
+      this.tempContent = this.example.content
+      return res
+    },
+    // 展示的关系
+    ctxComponent() {
+      const component = this.example.type === 0 ? "entity" : "relation"
+
+      return component
+    },
+  },
   methods: {
-    add() {
-      this.visible = true
+    // 上下文函数切换
+    ctxFunction(param) {
+      if (this.ctx.type === 0){
+        return dealEntity(param) 
+      }else{
+        param.content = this.tempContent
+        return dealRelation(param)
+      }
     },
-    edit(record) {
-      this.visible = true
-      this.buttonList = record.buttonList
-      this.mdl = Object.assign({}, record)
-      this.$nextTick(() => {
-        this.form.setFieldsValue({ ...record })
-        if (record.passed === -1){
-          this.form.setFieldsValue({passed: undefined})
-        }
-      })
-    },
+    // 提交
     handleSubmit() {
       const {
         form: { validateFields }
       } = this
       const validateFieldsKey = ['content', 'description', 'passed']
+      if (this.ctx.type === 1){
+        this.ctx.content = this.tempContent
+        validateFieldsKey.push("relationId")
+      }
       this.confirmLoading = true
       validateFields(validateFieldsKey, { force: true }, (errors, values) => {
         if (!errors) {
-          console.log('values', values)
           const verifyParams = { ...values }
-          verifyParams.statId = this.mdl.stateId
-          verifyParams.id = this.mdl.id
-          dealEntity(verifyParams)
+          verifyParams.statId = this.ctx.statId
+          verifyParams.id = this.ctx.id
+          this.ctxFunction(verifyParams)
             .then(res => {
-              this.visible = false
               this.confirmLoading = false
+              this.form.resetFields()
               this.$emit('ok', values)
             })
             .catch(err => {
@@ -121,9 +147,12 @@ export default {
         }
       })
     },
+    // 关闭模态框
     handleCancel() {
-      this.visible = false
+      this.form.resetFields()
+      this.$emit("cancel")
     },
+    // 搜索
     handleSearch(value) {
       // this.opinionSources = !value?[]:[
       //   value,
@@ -138,13 +167,12 @@ export default {
           this.opinionSources = []
         })
     },
-    handleAddEntity(content) {
-      this.form.setFieldsValue({"content":content})
-    },
-    onSelect(value) {
-      console.log(value)
-    },
 
+    // 零时保存新的content
+    updateContent(c) {
+      this.tempContent = c
+      console.log(this.tempContent)
+    }
   }
 }
 </script>

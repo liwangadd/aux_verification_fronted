@@ -11,13 +11,13 @@
 <style scoped>
 .button-row button{
   margin-right: 5px;
+  min-width: 200px;
 }
 </style>
 
 <script>
-import { stat } from 'fs';
 export default {
-  name: "EntityButtons",
+  name: "entityButtons",
   props: ["buttonList", "content", "inObj"],
   methods:{
     // 点击插入
@@ -32,7 +32,6 @@ export default {
         // 获取头尾焦点
         var startPos = myField.$el.selectionStart
         var endPos = myField.$el.selectionEnd
-        console.log(startPos, endPos)
 
         // 增加焦点
         if (startPos === endPos){ // 没有选中, 直接在尾部加标签

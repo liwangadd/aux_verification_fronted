@@ -14,27 +14,30 @@
 
       <span slot="action" slot-scope="text, record">
         <template>
-          <a @click="handleModify(record)">修改</a>
+          <a @click="handleEdit(record)">修改</a>
         </template>
       </span>
     </s-table>
-    <entity-modify-modal ref="entityModifyModal" @ok="handleOk"/>
+
+    <verify-modal 
+      ref="verifyModal" 
+      :example="propsToVerify"
+      :visible="verifyModalVisible"
+      :entityButtonList="entityButtonList"
+      @ok="handleOk"
+      @cancel="handleModalCancel"
+      />
   </a-card>
 </template>
 
 <script>
-import moment from "moment";
 import { STable } from "@/components";
-import EntityModifyModal from "./modules/EntityModifyModal";
+import verifyModal from '@/custom/verifyModel/verifyModal.vue'
 import { listEntities } from "@/api/user";
 import { timeFormat } from '@/utils/util'
 import {getEntityLabels} from "@/api/verify"
 
 const statusMap = {
-  // 0: {
-  //   status: 'default',
-  //   text: '关闭'
-  // },
   2: {
     status: 'processing',
     text: '已通过'
@@ -53,13 +56,18 @@ export default {
   name: 'EntityHistory',
   components: {
     STable,
-    EntityModifyModal
+    verifyModal,
   },
   data() {
     return {
       // 实体标注按钮
-      EntityButtonList: [],
-      mdl: {},
+      entityButtonList: [],
+      // 查询参数
+      queryParam: {},
+      // 待传入模态框的审核内容
+      propsToVerify: {},
+      // 模态框显示
+      verifyModalVisible: false,
       queryParam: {},
       //表头
       columns: [
@@ -109,18 +117,23 @@ export default {
   },
   filters: {
     statusFilter (type) {
+      if (type === undefined){
+        return statusMap[0].text
+      }
       return statusMap[type + 1].text
     },
     statusTypeFilter (type) {
+      if (type === undefined){
+        return statusMap[0].status
+      }
       return statusMap[type + 1].status
     }
   },
   created() {
-    // getRoleList({ t: new Date() });
     // 获取实体按钮
     getEntityLabels()
       .then(res => {
-        this.$data.EntityButtonList = res.result.entityList
+        this.entityButtonList = res.result.entityList
       })
       .catch(err => {
         this.$notification['error']({
@@ -131,13 +144,27 @@ export default {
       })
   },
   methods: {
-    handleModify(record) {
-      record["buttonList"] = this.EntityButtonList
-      this.$refs.entityModifyModal.edit(record)
+    // 审核信息
+    handleEdit(record) {
+      record.type = 0
+      record.history = 1
+      this.propsToVerify = record
+      this.verifyModalVisible = true
     },
-    handleOk() {
+
+    // 信息审核提交
+    handleOk () {
+      // 关闭模态框
+      this.handleModalCancel()
+      // 刷新列表
       this.$refs.table.refresh()
-    }
+    },
+
+    // 模态框关闭
+    handleModalCancel(refresh) {
+      this.verifyModalVisible = false
+      this.$refs.table.refresh()
+    },
   }
 }
 </script>

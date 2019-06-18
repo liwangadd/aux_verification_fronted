@@ -46,11 +46,11 @@
 
 <script>
 import { dealRelation, prefixOpinion } from '@/api/verify'
-import EntityButtons from '@/custom/components/EntityButtons.vue';
+// import EntityButtons from '@/custom/components/EntityButtons.vue';
 
 export default {
   components:{
-    EntityButtons,
+    // EntityButtons,
   },
   data() {
     return {

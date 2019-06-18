@@ -45,8 +45,14 @@
       @click="getNextStatement({completeLast:true})"
     >下一条</a-button>
 
-    <ver-entity-modal ref="verEntityModal" @ok="handleOk"/>
-    <ver-relation-modal ref="verRelationModal" @ok="handleOk"/>
+    <verify-modal 
+      ref="verifyModal" 
+      :example="propsToVerify"
+      :visible="verifyModalVisible"
+      :entityButtonList="entityButtonList"
+      @ok="handleOk"
+      @cancel="handleModalCancel"
+      />
   </a-card>
 </template>
 
@@ -57,17 +63,11 @@
 </style>
 
 <script>
-// import moment from 'moment'
 import { STable } from '@/components'
-import VerEntityModal from './modules/VerEntityModal'
-import VerRelationModal from './modules/VerRelationModal'
+import verifyModal from '@/custom/verifyModel/verifyModal.vue'
 import { getEntityLabels, getVerifyContents, openNextStatement } from '@/api/verify'
 
 const statusMap = {
-  // 0: {
-  //   status: 'default',
-  //   text: '关闭'
-  // },
   2: {
     status: 'processing',
     text: '已通过'
@@ -86,21 +86,24 @@ export default {
   name: 'TableList',
   components: {
     STable,
-    VerEntityModal,
-    VerRelationModal
+    verifyModal,
   },
   data () {
     return {
       // 实体标注按钮
-      EntityButtonList: [],
-      mdl: {},
+      entityButtonList: [],
       // 查询参数
       queryParam: {},
+      // 待传入模态框的审核内容
+      propsToVerify: {},
+      // 模态框显示
+      verifyModalVisible: false,
 
+      // pdf来源
       pdfUrl: '',
-
       pdfNo: -1,
 
+      // 表格内容
       contents: {},
       // 表头
       columns: [
@@ -131,7 +134,6 @@ export default {
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        console.log('loadData.parameter', parameter)
         Object.assign(this.queryParam, parameter)
         return getVerifyContents(this.queryParam).then(res => {
           this.pdfUrl = res.result.pdfUrl
@@ -143,30 +145,60 @@ export default {
     }
   },
   created () {
-    // getRoleList({ t: new Date() })
+    // 获取实体按钮
+    getEntityLabels()
+      .then(res => {
+        this.entityButtonList = res.result.entityList
+      })
+      .catch(err => {
+        this.$notification['error']({
+          message: '错误',
+          description: '获取实体按钮错误' + err,
+          duration: 1
+        })
+      })
+    // 获取审核文本
     this.getNextStatement({completeLast:false})
   },
+
   filters: {
     statusFilter (type) {
+      if (type === undefined){
+        return statusMap[0].text
+      }
       return statusMap[type + 1].text
     },
     statusTypeFilter (type) {
+      if (type === undefined){
+        return statusMap[0].status
+      }
       return statusMap[type + 1].status
     }
   },
+
   methods: {
+    // 审核信息
     handleEdit(record) {
-      record["buttonList"] = this.$data.EntityButtonList
-      if (record.type === 0) {
-        this.$refs.verEntityModal.edit(record)
-      } else {
-        this.$refs.verRelationModal.edit(record)
-      }
+      this.propsToVerify = record
+      this.verifyModalVisible = true
     },
+
+    // 信息审核提交
     handleOk () {
+      // 关闭模态框
+      this.handleModalCancel()
+      // 刷新列表
       this.$refs.table.refresh()
     },
+
+    // 模态框关闭
+    handleModalCancel(refresh) {
+      this.verifyModalVisible = false
+      this.$refs.table.refresh()
+    },
+    // 获取下一个信息
     getNextStatement(parameter) {
+      // 判断审核是否完成
       for (let i = 0; i < this.contents.length; ++i) {
         if (this.contents[i].passed === -1) {
           this.$notification['warn']({
@@ -177,28 +209,16 @@ export default {
           return
         }
       }
+
+      // 获取下一个审核
       openNextStatement(parameter)
         .then(res => {
-          console.log('初始化获取审核文本')
           this.handleOk()
         })
         .catch(err => {
           this.$notification['info']({
             message: '通知',
             description: '没有需要审核的文本',
-            duration: 1
-          })
-        })
-
-      // 获取实体按钮
-      getEntityLabels()
-        .then(res => {
-          this.$data.EntityButtonList = res.result.entityList
-        })
-        .catch(err => {
-          this.$notification['error']({
-            message: '错误',
-            description: '获取实体按钮错误' + err,
             duration: 1
           })
         })
