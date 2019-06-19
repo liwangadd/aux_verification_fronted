@@ -37,7 +37,13 @@
       </span>
     </s-table>
     <a-button
-      style="margin-top:24px float: right"
+      size="large"
+      type="default"
+      class="login-button"
+      @click="addNewRelation()"
+    >添加关系</a-button>
+    
+    <a-button
       size="large"
       type="primary"
       htmlType="submit"
@@ -56,10 +62,11 @@
   </a-card>
 </template>
 
-<style>
-.button-row button{
-  margin-right: 5px
+<style scoped>
+button{
+  margin-right: 10px
 }
+
 </style>
 
 <script>
@@ -196,6 +203,7 @@ export default {
       this.verifyModalVisible = false
       this.$refs.table.refresh()
     },
+
     // 获取下一个信息
     getNextStatement(parameter) {
       // 判断审核是否完成
