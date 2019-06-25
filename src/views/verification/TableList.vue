@@ -110,6 +110,9 @@ export default {
       pdfUrl: '',
       pdfNo: -1,
 
+      // 原始文本
+      rawContent: '',
+
       // 表格内容
       contents: {},
       // 表头
@@ -146,6 +149,8 @@ export default {
           this.pdfUrl = res.result.pdfUrl
           this.pdfNo = res.result.pdfNo
           this.contents = res.result.data
+
+          this.rawContent = res.result.data[0].content
           return res.result
         })
       }
@@ -201,7 +206,17 @@ export default {
     // 模态框关闭
     handleModalCancel(refresh) {
       this.verifyModalVisible = false
-      this.$refs.table.refresh()
+    },
+
+    // 新增关系
+    addNewRelation(){
+      // 构造一个record
+      let record = {}
+
+      Object.assign(record, this.contents[0])
+      record.type=1
+
+      this.handleEdit(record)
     },
 
     // 获取下一个信息
@@ -230,7 +245,7 @@ export default {
             duration: 1
           })
         })
-    }
+    },
   }
 }
 </script>

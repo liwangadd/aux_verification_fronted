@@ -8,9 +8,18 @@ export function getVerifyContents (parameter) {
   })
 }
 
+// 获取实体按键
 export function getEntityLabels () {
   return axios({
     url: '/ver/util/entiReflect',
+    method: 'get',
+  })
+}
+
+// 获取关系标签
+export function getRelationLabels () {
+  return axios({
+    url: '/ver/util/relationReflect',
     method: 'get',
   })
 }

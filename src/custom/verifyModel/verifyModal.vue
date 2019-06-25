@@ -118,7 +118,13 @@ export default {
         form: { validateFields }
       } = this
       const validateFieldsKey = ['content', 'description', 'passed']
+      // 对于关系的一些处理
       if (this.ctx.type === 1){
+        if(this.tempContent.indexOf("e1") <= 0 || this.tempContent.indexOf("e2") <= 0){
+          //  实体不全
+          this.$error({content: "实体标注不全"})
+          return
+        }
         this.ctx.content = this.tempContent
         validateFieldsKey.push("relationId")
       }
@@ -171,7 +177,6 @@ export default {
     // 零时保存新的content
     updateContent(c) {
       this.tempContent = c
-      console.log(this.tempContent)
     }
   }
 }
