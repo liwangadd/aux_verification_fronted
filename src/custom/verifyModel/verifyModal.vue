@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { dealEntity, prefixOpinion, dealRelation } from '@/api/verify'
+import { dealEntity, prefixOpinion, dealRelation, addRelation } from '@/api/verify'
 import entity from './components/entity/entity.vue'
 import relation from './components/relation/relation.vue'
 import pdf from './components/pdf.vue'
@@ -108,7 +108,12 @@ export default {
       if (this.ctx.type === 0){
         return dealEntity(param) 
       }else{
+        // 必要，表单没有存content
         param.content = this.tempContent
+        if (param.hasOwnProperty('add')){
+          return addRelation(param)
+        }
+        
         return dealRelation(param)
       }
     },
@@ -126,6 +131,7 @@ export default {
           return
         }
         this.ctx.content = this.tempContent
+        // 对关系的一些验证
         validateFieldsKey.push("relationId")
       }
       this.confirmLoading = true
@@ -134,6 +140,10 @@ export default {
           const verifyParams = { ...values }
           verifyParams.statId = this.ctx.statId
           verifyParams.id = this.ctx.id
+          if (this.ctx.hasOwnProperty('add')){
+            verifyParams.add = true
+          }
+
           this.ctxFunction(verifyParams)
             .then(res => {
               this.confirmLoading = false
@@ -141,7 +151,9 @@ export default {
               this.$emit('ok', values)
             })
             .catch(err => {
+              let data = err.response.data
               this.confirmLoading = false
+              this.$error({title: data.message, content: data.result})
             })
           // setTimeout(() => {
           //   this.visible = false

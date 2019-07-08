@@ -73,6 +73,7 @@ button{
 import { STable } from '@/components'
 import verifyModal from '@/custom/verifyModel/verifyModal.vue'
 import { getEntityLabels, getVerifyContents, openNextStatement } from '@/api/verify'
+import { getRelationLabels } from '@/api/verify'
 
 const statusMap = {
   2: {
@@ -99,6 +100,8 @@ export default {
     return {
       // 实体标注按钮
       entityButtonList: [],
+      // 关系类别
+      relationLabelList: [],
       // 查询参数
       queryParam: {},
       // 待传入模态框的审核内容
@@ -112,6 +115,7 @@ export default {
 
       // 原始文本
       rawContent: '',
+      statId:0,
 
       // 表格内容
       contents: {},
@@ -149,8 +153,9 @@ export default {
           this.pdfUrl = res.result.pdfUrl
           this.pdfNo = res.result.pdfNo
           this.contents = res.result.data
+          this.statId = res.result.id
+          this.rawContent = res.result.rawContent
 
-          this.rawContent = res.result.data[0].content
           return res.result
         })
       }
@@ -161,6 +166,18 @@ export default {
     getEntityLabels()
       .then(res => {
         this.entityButtonList = res.result.entityList
+      })
+      .catch(err => {
+        this.$notification['error']({
+          message: '错误',
+          description: '获取实体按钮错误' + err,
+          duration: 1
+        })
+      })
+    // 获取关系
+    getRelationLabels()
+      .then(res => {
+        this.relationLabelList = res.result.relationList
       })
       .catch(err => {
         this.$notification['error']({
@@ -212,9 +229,16 @@ export default {
     addNewRelation(){
       // 构造一个record
       let record = {}
-
-      Object.assign(record, this.contents[0])
-      record.type=1
+      record.type=1 // 关系类型
+      record.statId = this.statId //聚类id
+      record.content = this.rawContent   // 文本
+      record.passed = 1 //自动同意
+      record.id = 0 // 不要id
+      record.relationId = null // 关系id
+      record.relationName = ""  //关系名
+      record.reflects = this.relationLabelList
+      record.description = "" // 意见
+      record.add = true //添加关系标签
 
       this.handleEdit(record)
     },
@@ -223,7 +247,7 @@ export default {
     getNextStatement(parameter) {
       // 判断审核是否完成
       for (let i = 0; i < this.contents.length; ++i) {
-        if (this.contents[i].passed === -1) {
+        if (this.contents[i].passed < 0 || !this.contents[i].passed) {
           this.$notification['warn']({
             message: '通知',
             description: '还有文本没有审核',

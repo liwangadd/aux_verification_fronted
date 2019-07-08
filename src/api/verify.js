@@ -48,6 +48,15 @@ export function dealRelation (parameter) {
   })
 }
 
+// 添加新的关系
+export function addRelation (parameter) {
+  return axios({
+    url: '/ver/relation',
+    method: 'post',
+    data: parameter
+  })
+}
+
 export function prefixOpinion (parameter) {
   return axios({
     url: '/ver/opinion/prefix',
