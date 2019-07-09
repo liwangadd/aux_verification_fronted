@@ -108,8 +108,6 @@ export default {
       if (this.ctx.type === 0){
         return dealEntity(param) 
       }else{
-        // 必要，表单没有存content
-        param.content = this.tempContent
         if (param.hasOwnProperty('add')){
           return addRelation(param)
         }
@@ -123,6 +121,7 @@ export default {
         form: { validateFields }
       } = this
       const validateFieldsKey = ['content', 'description', 'passed']
+      this.ctx.content = this.tempContent
       // 对于关系的一些处理
       if (this.ctx.type === 1){
         if(this.tempContent.indexOf("e1") <= 0 || this.tempContent.indexOf("e2") <= 0){
@@ -130,7 +129,6 @@ export default {
           this.$error({content: "实体标注不全"})
           return
         }
-        this.ctx.content = this.tempContent
         // 对关系的一些验证
         validateFieldsKey.push("relationId")
       }
@@ -140,6 +138,8 @@ export default {
           const verifyParams = { ...values }
           verifyParams.statId = this.ctx.statId
           verifyParams.id = this.ctx.id
+          // 必要，表单没有存content
+          verifyParams.content = this.ctx.content
           if (this.ctx.hasOwnProperty('add')){
             verifyParams.add = true
           }
