@@ -53,9 +53,9 @@
 
     <verify-modal 
       ref="verifyModal" 
-      :example="propsToVerify"
+      :ctx="modelCtx"
       :visible="verifyModalVisible"
-      :entityButtonList="entityButtonList"
+      :entityLabelList="entityLabelList"
       @ok="handleOk"
       @cancel="handleModalCancel"
       />
@@ -99,13 +99,13 @@ export default {
   data () {
     return {
       // 实体标注按钮
-      entityButtonList: [],
+      entityLabelList: [],
       // 关系类别
       relationLabelList: [],
       // 查询参数
       queryParam: {},
       // 待传入模态框的审核内容
-      propsToVerify: {},
+      modelCtx: {},
       // 模态框显示
       verifyModalVisible: false,
 
@@ -165,7 +165,7 @@ export default {
     // 获取实体按钮
     getEntityLabels()
       .then(res => {
-        this.entityButtonList = res.result.entityList
+        this.entityLabelList = res.result.entityList
       })
       .catch(err => {
         this.$notification['error']({
@@ -208,7 +208,7 @@ export default {
   methods: {
     // 审核信息
     handleEdit(record) {
-      this.propsToVerify = record
+      this.modelCtx = record
       this.verifyModalVisible = true
     },
 
@@ -223,6 +223,7 @@ export default {
     // 模态框关闭
     handleModalCancel(refresh) {
       this.verifyModalVisible = false
+      this.modelCtx = {}
     },
 
     // 新增关系
@@ -238,7 +239,7 @@ export default {
       record.relationName = ""  //关系名
       record.reflects = this.relationLabelList
       record.description = "" // 意见
-      record.add = true //添加关系标签
+      record.add = true //当前条目处于添加状态（切换api）
 
       this.handleEdit(record)
     },

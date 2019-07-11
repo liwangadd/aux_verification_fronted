@@ -17,6 +17,7 @@
 </style>
 
 <script>
+import { getActualSelect } from "@/utils/select";
 export default {
   name: "relationButtons",
   data() {
@@ -31,11 +32,6 @@ export default {
           color: "palegreen",
           name: "实体二",
           value: "e2",
-        },
-        {
-          color: "white",
-          name: "清除实体",
-          value: "clear",
         }
       ]
 
@@ -46,15 +42,10 @@ export default {
     // 点击插入
     insertAtCursor(entV) {
       const self = this
-      // 获取div及其内容, 内容不包含标签
+      // 获取div及其内容, 内容包含标签
       const myField = this.inObj
-      let content = myField.innerText
-
-      // 清除实体
-      if (entV === "clear"){
-        this.$emit("addEntity", content)
-        return
-      }
+      const content = myField.innerText
+      const contentHTML = myField.innerHTML
 
       // 判断是否选中
       const selectText = window.getSelection().toString()
@@ -62,35 +53,47 @@ export default {
         return
       }      
 
+      // 选中的开始结尾
+      // 以 innerText 为准
+      const [start, end] = getActualSelect(this.inObj);
 
       // 另一个实体
       const oEnt = entV === "e1"? "e2" : "e1"
       const oEntObj = myField.querySelector(oEnt)
       if(oEntObj === null){
         // 没有另一个实体则直接拼接，跳过逻辑判断
-        let insertPos = content.indexOf(selectText)
         let startTag = "<" + entV + ">"
         let endTag = "</" + entV + ">"
-        content = content.substring(0, insertPos) 
+        const newContent = content.substring(0, start) 
               + startTag + selectText + endTag
-              + content.substring(insertPos + selectText.length)
+              + content.substring(end)
 
-        this.$emit("addEntity", content)
+        this.$emit("addEntity", newContent)
         return
+      }
+      // 得到另一个实体在 text 中的位置
+      let oPos = 0;
+      for (let index = 0; index < myField.childNodes.length; index++) {
+          var cnode = myField.childNodes[index];
+          if (oEntObj === cnode) break;
+          // 找到的节点都需要加上 offset
+          oPos += cnode.nodeType === document.TEXT_NODE ?
+                  cnode.length : cnode.innerText.length;
       }
 
       // 获取e1 e2实体
-      let e1,e2
+      let e1,e2, e1Pos, e2Pos;
       if (entV === "e1"){
-        e1 = selectText
-        e2 = oEntObj.innerText
+        e1 = selectText;
+        e2 = oEntObj.innerText;
+        e1Pos = start; 
+        e2Pos = oPos;
       }else{
-        e2 = selectText
-        e1 = oEntObj.innerText
+        e2 = selectText;
+        e1 = oEntObj.innerText;
+        e2Pos = start; 
+        e1Pos = oPos;
       }
-      // 实体位置
-      const e1Pos = content.indexOf(e1) 
-      const e2Pos = content.indexOf(e2)
 
       /** 一些逻辑判断 */
       // e1 e2 相对位置判断
@@ -104,13 +107,14 @@ export default {
           return
       }
 
-      content = content.substring(0, e1Pos) 
+      let newcontent = content.substring(0, e1Pos) 
             + "<e1>" + e1 + "</e1>"
             + content.substring(e1Pos+e1.length,e2Pos)
             + "<e2>" + e2 + "</e2>"
             + content.substring(e2Pos+e2.length)
       
-      this.$emit("addEntity", content)
+      this.$emit("addEntity", newcontent)
+      return
     },
 
     setStyle(v){

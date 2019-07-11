@@ -1,13 +1,18 @@
 <template>
   <div>
-    <a-form-item label="文本内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
-      <div v-html="content" ref="contextarea" ></div>
-      <!-- 实体插入 button -->
-      <relationbuttons
-        :inObj="inObj"
-        @addEntity="handleAddEntity"
-      />
-    </a-form-item>
+    <content-display
+      :content=entContent
+      :buttonList=buttonList
+      @update="updateContent"
+      ref="cDiv"
+      >
+      <template v-slot:button>
+        <relation-buttons
+          :inObj="inObj"
+          @addEntity="updateContent"
+        />
+      </template>
+    </content-display>
     <a-form-item label="关系类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
       <a-select
         v-decorator="['relationId', {rules: [{required: true}], initialValue: ctx.relationId}]" 
@@ -34,11 +39,12 @@ e2{
 
 
 <script>
-import relationbuttons from './relationButtons.vue'
+import relationButtons from './relationButtons.vue'
+import contentDisplay from '../contentDisplay.vue'
 import {mapActions} from 'vuex'
 
 export default {
-  components: {relationbuttons},
+  components: {relationButtons, contentDisplay},
   data() {
     return {
       // 标签样式
@@ -51,7 +57,7 @@ export default {
         xs: { span: 24 },
         sm: { span: 13 }
       },
-      inObj: this.$refs.contextarea
+      inObj: null,
     }
   },
   props: ['buttonList', 'content', 'ctx'],
@@ -59,10 +65,9 @@ export default {
     ...mapActions([
       'increment', // 将 `this.increment()` 映射为 `this.$store.dispatch('increment')`
     ]),
-    // 处理实体
-    handleAddEntity(content) {
-      this.content = content
-      this.$refs.contextarea.innerHTML = content
+    // 更新实体标注
+    updateContent(content) {
+      // this.entContent = content
       this.$emit("update",content)
     },
     // 更新关系热key
@@ -80,11 +85,16 @@ export default {
       })
     }
   },
+  computed:{
+    entContent() {
+      return this.content
+    }
+  },
 
   mounted(){
     // 延迟更新
     this.$nextTick(() => {
-      this.inObj = this.$refs.contextarea
+      this.inObj = this.$refs.cDiv.$refs.contextarea
     })
 
   },

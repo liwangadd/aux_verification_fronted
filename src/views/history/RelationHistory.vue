@@ -21,9 +21,9 @@
 
     <verify-modal 
       ref="verifyModal" 
-      :example="propsToVerify"
+      :ctx="propsToVerify"
       :visible="verifyModalVisible"
-      :entityButtonList="entityButtonList"
+      :entityLabelList="entityButtonList"
       @ok="handleOk"
       @cancel="handleModalCancel"
       />
@@ -110,7 +110,6 @@ export default {
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        console.log ('loadData.parameter', parameter)
         Object.assign (this.queryParam, parameter)
         return listRelations (this.queryParam)
         .then ((res)=>{
@@ -156,7 +155,7 @@ export default {
     // 模态框关闭
     handleModalCancel(refresh) {
       this.verifyModalVisible = false
-      this.$refs.table.refresh()
+      this.propsToVerify = {}
     },
   }
 }
