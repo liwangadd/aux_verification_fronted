@@ -56,6 +56,7 @@
       :ctx="modelCtx"
       :visible="verifyModalVisible"
       :entityLabelList="entityLabelList"
+      :entityPassed="entityPassed"
       @ok="handleOk"
       @cancel="handleModalCancel"
       />
@@ -116,6 +117,7 @@ export default {
       // 原始文本
       rawContent: '',
       statId:0,
+      entityPassed: -1, // 实体是否被拒绝
 
       // 表格内容
       contents: {},
@@ -155,6 +157,8 @@ export default {
           this.contents = res.result.data
           this.statId = res.result.id
           this.rawContent = res.result.rawContent
+          // 保存实体数据判定状态
+          this.entityPassed = this.contents[0].passed
 
           return res.result
         })
@@ -248,7 +252,7 @@ export default {
     getNextStatement(parameter) {
       // 判断审核是否完成
       for (let i = 0; i < this.contents.length; ++i) {
-        if (this.contents[i].passed < 0 || !this.contents[i].passed) {
+        if (this.contents[i].passed < 0 ) {
           this.$notification['warn']({
             message: '通知',
             description: '还有文本没有审核',

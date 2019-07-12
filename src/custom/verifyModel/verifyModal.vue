@@ -1,8 +1,8 @@
 <template>
   <a-modal
     title="标注审核"
+    :visible="visible"
     :width="840"
-    v-model="visible"
     :confirmLoading="confirmLoading"
     @ok="handleSubmit"
     @cancel="handleCancel"
@@ -33,12 +33,22 @@
           />
         </a-form-item>
 
-        <a-form-item label="审核" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <span slot="label">
+            <a-tooltip title="该关系对应实体标注被拒绝！" 
+                        v-if="entityPassed === 0 && model.type === 1"
+                        :visible="true"
+                        placement="left">
+              <a-icon type="info-circle" theme="twoTone" twoToneColor="#eb2f96" />
+            </a-tooltip>
+            审核
+          </span>
           <a-select
             v-decorator="['passed', {rules: [{required:true}], initialValue: model.passed}]"
             placeholder="请选择"
           >
-            <a-select-option :value="1">通过</a-select-option>
+            <a-select-option :value="1" 
+                            v-if="entityPassed !== 0 || model.type === 0" >通过</a-select-option>
             <a-select-option :value="0">拒绝</a-select-option>
           </a-select>
         </a-form-item>
@@ -58,6 +68,7 @@ export default {
     "visible",  //可见
     "ctx",  // 传入数据上下文
     "entityLabelList",
+    "entityPassed"
   ],
   components:{
     entity,
@@ -101,8 +112,12 @@ export default {
   watch: {
     ctx(newCtx){
       this.model = Object.assign({},newCtx)
+      // 当处于实体拒绝状态，且传入数据为关系,自动把通过状态设为拒绝
+      if (this.model.type === 1 && this.entityPassed === 0){
+        this.model.passed = 0;
+      }
       if (this.model.passed === -1){
-        this.model.passed = null
+        this.model.passed = null;
       }
     }
   },
@@ -123,8 +138,24 @@ export default {
       }
     },
 
-    // 提交
-    handleSubmit() {
+    // 显示实体拒绝二次确认
+    showEntityRejectConfirm(){
+      return new Promise(resolve => {
+        this.$confirm({
+          title: '拒绝实体标注',
+          content: '当拒绝实体标注后，所有关系标注将只能拒绝,请确认',
+          onOk() {
+            resolve(true)
+          },
+          onCancel() {
+            resolve(false)
+          },
+        });
+      })
+    },
+
+    // 提交前处理
+    async handleSubmit() {
       const {
         form: { validateFields }
       } = this  // 获得 validateFields 函数
@@ -132,8 +163,16 @@ export default {
       // 一些必要的公共参数
       const validateFieldsKey = ['description', 'passed']
       // this.model.content = this.tempContent
-      // 对于关系的一些处理
-      if (this.model.type === 1){
+      // 对实体的一些处理
+      if (this.model.type === 0){
+        if (this.form.getFieldValue("passed") === 0){ // 审核不通过
+          // 给予提示
+          let confirm = await this.showEntityRejectConfirm();
+          if (!confirm){
+            return
+          }
+        }
+      }else if (this.model.type === 1){ // 对于关系的一些处理 
         if (this.form.getFieldValue("passed") === 1){ // 审核通过
           if((this.model.content.indexOf("e1") < 0 || this.model.content.indexOf("e2") < 0)){
             //  通过但是，实体不全
@@ -174,6 +213,7 @@ export default {
         }
       })
     },
+
     // 关闭模态框
     handleCancel() {
       this.form.resetFields()
