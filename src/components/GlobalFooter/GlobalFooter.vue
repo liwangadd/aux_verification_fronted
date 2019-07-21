@@ -16,7 +16,7 @@
     </div>
     <div class="copyright">
       Copyright
-      <a-icon type="copyright" /> 2019 <span>网络与交换技术国家重点实验室-交换与智能控制研究中心</span>
+      <a-icon type="copyright" /> 2019 <span>北京合立春天科技发展有限公司</span>
     </div>
   </div>
 </template>
