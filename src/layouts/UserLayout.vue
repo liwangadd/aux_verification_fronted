@@ -15,27 +15,19 @@
 
       <route-view></route-view>
 
-      <div class="footer">
-        <!-- <div class="links">
-          <a href="_self">帮助</a>
-          <a href="_self">隐私</a>
-          <a href="_self">条款</a>
-        </div> -->
-        <div class="copyright">
-          Copyright &copy; 2019 网络与交换技术国家重点实验室-交换与智能控制研究中心
-        </div>
-      </div>
+      <global-footer />
     </div>
   </div>
 </template>
 
 <script>
 import RouteView from './RouteView'
+import GlobalFooter from '@/components/GlobalFooter'
 import { mixinDevice } from '@/utils/mixin'
 
 export default {
   name: 'UserLayout',
-  components: { RouteView },
+  components: { RouteView,GlobalFooter },
   mixins: [mixinDevice],
   data () {
     return {}
