@@ -79,8 +79,17 @@ export default {
 
     deleteNER(e){
       let eNode = e.outerHTML
-      let content = this.$refs.contextarea.innerHTML
-      let ePos = content.indexOf(eNode)
+      let cNode = this.$refs.contextarea
+      let content = cNode.innerHTML;
+      let ePos = 0;
+      // 得到点击实体在 text 中的位置
+      for (let index = 0; index < cNode.childNodes.length; index++) {
+        const element = cNode.childNodes[index];
+        if (element === e) break;
+        // 找到的节点都需要加上 offset
+        ePos += element.nodeType === document.TEXT_NODE ?
+                element.length : element.outerHTML.length;
+      }
       let newcontent = content.substring(0, ePos)
               + e.innerText
               + content.substring(ePos + eNode.length)
