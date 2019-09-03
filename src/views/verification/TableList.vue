@@ -232,6 +232,15 @@ export default {
 
     // 新增关系
     addNewRelation(){
+      if (this.entityPassed === 0){
+        // 实体审核未通过禁止添加
+        this.$error({
+          title: '无效添加',
+          content: '当前实体标注被拒绝,无法添加关系',
+          centered: true
+        });
+        return;
+      }
       // 构造一个record
       let record = {}
       record.type=1 // 关系类型

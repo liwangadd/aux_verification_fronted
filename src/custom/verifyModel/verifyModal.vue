@@ -33,7 +33,7 @@
           />
         </a-form-item>
 
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" >
           <span slot="label">
             <a-tooltip title="该关系对应实体标注被拒绝！" 
                         v-if="entityPassed === 0 && model.type === 1"
@@ -43,15 +43,18 @@
             </a-tooltip>
             审核
           </span>
-          <a-select
+            <a-radio-group 
             v-decorator="['passed', {rules: [{required:true}], initialValue: model.passed}]"
-            placeholder="请选择"
-          >
-            <a-select-option :value="1" 
-                            v-if="entityPassed !== 0 || model.type === 0" >通过</a-select-option>
-            <a-select-option :value="0">拒绝</a-select-option>
-          </a-select>
-        </a-form-item>
+            buttonStyle="solid">
+              <a-radio-button :value="1"
+                            :disabled="entityPassed === 0 && model.type === 1">
+                            通过
+              </a-radio-button>
+              <a-radio-button :value="0">
+                拒绝
+              </a-radio-button>
+            </a-radio-group>
+          </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
