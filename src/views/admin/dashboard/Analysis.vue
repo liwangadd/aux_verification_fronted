@@ -2,12 +2,28 @@
   <a-layout-content>
     <a-row :gutter="24" type="flex" align="middle" justify="center" >
       <a-col :span="12" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" title="关系标注" total="统计中...">
-        </chart-card>
+        <a-card :loading="loading" title="实体标注情况">
+          <p>通过：<number>{{ entityCount.passedCount || "统计中..." }}</number> 条</p>
+          <p>拒绝：<number>{{ entityCount.rejectCount || "统计中..." }}</number> 条</p>
+          <p>未审核：<number>{{ entityCount.remainCount || "统计中..." }}</number> 条</p>
+
+          <a-button
+          slot="extra" type="primary"
+          ><router-link to='/admin/list/entity-list'>查看</router-link></a-button>
+
+        </a-card>
       </a-col>
       <a-col :span="12" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" title="实体标注" total="统计中...">
-        </chart-card>
+        <a-card :loading="loading" title="关系标注情况">
+          <a-button
+          slot="extra" type="primary"
+          ><router-link to='/admin/list/relation-list'>查看</router-link></a-button>
+
+          <p>通过：<number>{{ relationCount.passedCount || "统计中..." }}</number> 条</p>
+          <p>拒绝：<number>{{ relationCount.rejectCount || "统计中..." }}</number> 条</p>
+          <p>未审核：<number>{{ relationCount.remainCount || "统计中..." }}</number> 条</p>
+
+        </a-card>
       </a-col>
     </a-row>
   </a-layout-content>
@@ -17,6 +33,7 @@
 import moment from 'moment'
 import { ChartCard, Trend} from '@/components'
 import { mixinDevice } from '@/utils/mixin'
+import { getEntityCount, getRelationCount} from '@/api/admin/statistic'
 
 
 export default {
@@ -29,63 +46,29 @@ export default {
   data () {
     return {
       loading: true,
+      entityCount:{},
+      relationCount:{},
     }
   },
   created () {
     setTimeout(() => {
       this.loading = !this.loading
     }, 1000)
+
+    getEntityCount().then(res => {
+      this.entityCount = res.result
+    })
+
+    getRelationCount().then(res => {
+      this.relationCount = res.result
+    })
   }
 }
 </script>
 
 <style lang="less" scoped>
-  .extra-wrapper {
-    line-height: 55px;
-    padding-right: 24px;
-
-    .extra-item {
-      display: inline-block;
-      margin-right: 24px;
-
-      a {
-        margin-left: 24px;
-      }
-    }
-  }
-
-  .antd-pro-pages-dashboard-analysis-twoColLayout {
-    position: relative;
-    display: flex;
-    display: block;
-    flex-flow: row wrap;
-
-    &.desktop div[class^=ant-col]:last-child {
-      position: absolute;
-      right: 0;
-      height: 100%;
-    }
-  }
-
-  .antd-pro-pages-dashboard-analysis-salesCard {
-    height: calc(100% - 24px);
-    /deep/ .ant-card-head {
-      position: relative;
-    }
-  }
-
-  .dashboard-analysis-iconGroup {
-    i {
-      margin-left: 16px;
-      color: rgba(0,0,0,.45);
-      cursor: pointer;
-      transition: color .32s;
-      color: black;
-    }
-  }
-  .analysis-salesTypeRadio {
-    position: absolute;
-    right: 54px;
-    bottom: 12px;
-  }
+number{
+  font-size: 24px;
+  font-weight: bold;
+}
 </style>
