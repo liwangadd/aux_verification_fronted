@@ -12,6 +12,13 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['login', 'register', 'registerResult'] // no redirect whitelist
 
+// 权限判断
+function hasPermission(roles, permissionRoles) {
+  // if (roles.indexOf('admin') >= 0) return true // admin permission passed directly
+  if (!permissionRoles) return true
+  return permissionRoles.indexOf(roles) >= 0
+}
+
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
   to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${to.meta.title}`))
@@ -19,7 +26,7 @@ router.beforeEach((to, from, next) => {
   if (Vue.ls.get(ACCESS_TOKEN)) {
     /* has token */
     if (to.path === '/user/login') {
-      next({ path: '/dashboard/workplace' })
+      next({ path: "/" , replace: true})
       NProgress.done()
     } else {
       if (store.getters.roles.length === 0) {
@@ -32,13 +39,8 @@ router.beforeEach((to, from, next) => {
               // 动态添加可访问路由表
               router.addRoutes(store.getters.addRouters)
               const redirect = decodeURIComponent(from.query.redirect || to.path)
-              if (to.path === redirect) {
-                // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
-                next({ ...to, replace: true })
-              } else {
-                // 跳转到目的路由
-                next({ path: redirect })
-              }
+              // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
+              next({ path: redirect, replace: true })
             })
           })
           .catch(() => {
@@ -51,7 +53,16 @@ router.beforeEach((to, from, next) => {
             })
           })
       } else {
-        next()
+        // 动态主页跳转
+        if (to.path === "/"){
+          next({ path: "/" + store.getters.roles + "-index", replace: true })
+        }else{
+          if (hasPermission(store.getters.roles, to.meta.permission)) {
+            next()
+          } else {
+            next({ path: '/404'})
+          }
+        }
       }
     }
   } else {
@@ -59,7 +70,8 @@ router.beforeEach((to, from, next) => {
       // 在免登录白名单，直接进入
       next()
     } else {
-      next({ path: '/user/login', query: { redirect: to.fullPath } })
+      // next({ path: '/user/login', query: { redirect: to.fullPath } })
+      next({ path: '/user/login' })
       NProgress.done() // if current page is login will not trigger afterEach hook, so manually handle it
     }
   }

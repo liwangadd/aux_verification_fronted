@@ -10,11 +10,9 @@ import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
 function hasPermission (permission, route) {
   if (route.meta && route.meta.permission) {
     let flag = false
-    for (let i = 0, len = permission.length; i < len; i++) {
-      flag = route.meta.permission.includes(permission[i])
-      if (flag) {
-        return true
-      }
+    flag = route.meta.permission.includes(permission)
+    if (flag) {
+      return true
     }
     return false
   }
@@ -39,7 +37,7 @@ function hasRole(roles, route) {
 
 function filterAsyncRouter (routerMap, roles) {
   const accessedRouters = routerMap.filter(route => {
-    if (hasPermission(roles.permissionList, route)) {
+    if (hasPermission(roles, route)) {
       if (route.children && route.children.length) {
         route.children = filterAsyncRouter(route.children, roles)
       }
@@ -65,9 +63,10 @@ const permission = {
     GenerateRoutes ({ commit }, data) {
       return new Promise(resolve => {
         // 根据用于角色显示具有权限的菜单项
-        // const { roles } = data
-        // const accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
-        commit('SET_ROUTERS', asyncRouterMap)
+        const { roles } = data
+        const accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
+        // commit('SET_ROUTERS', asyncRouterMap)
+        commit('SET_ROUTERS', accessedRouters)
         resolve()
       })
     }

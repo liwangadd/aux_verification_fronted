@@ -17,14 +17,8 @@
         </slot>
       </div>
     </div>
-    <div class="chart-card-content">
-      <div class="content-fix">
-        <slot></slot>
-      </div>
-    </div>
     <div class="chart-card-footer">
       <div class="field">
-        <slot name="footer"></slot>
       </div>
     </div>
   </a-card>
@@ -75,7 +69,7 @@ export default {
   }
 
   .chart-card-footer {
-    border-top: 1px solid #e8e8e8;
+    // border-top: 1px solid #e8e8e8;
     padding-top: 9px;
     margin-top: 8px;
 

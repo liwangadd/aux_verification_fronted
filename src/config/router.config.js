@@ -9,33 +9,65 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/verification',
     children: [
+      // 管理员首页
+      {
+        path: '/dashboard',
+        alias: 'admin-index',
+        name: 'dashboard',
+        component: () => import('@/views/admin/dashboard/Analysis'),
+        meta: { title: '数据统计', keepAlive: true, permission: ["admin"] }
+      },
+      // 标注员首页
       {
         path: '/verification',
+        alias: 'annotator-index',
         name: 'verification',
         component: () => import('@/views/verification/TableList'),
-        meta: { title: '审核标注', keepAlive: true, permission: ['verification'], icon: 'form' }
+        meta: { title: '审核标注', keepAlive: true, permission: ["annotator"], icon: 'form' }
       },
+      // 标注员记录列表
       {
         path: '/list',
-        name: 'list',
+        name: 'annotator-list',
         component: PageView,
         redirect: '/list/entity-list',
-        meta: { title: '已审核', icon: 'table', permission: ['table'] },
+        meta: { title: '已审核', icon: 'table', permission: ["annotator"] },
         children: [
           {
             path: '/list/entity-list',
             name: 'EntityHistory',
-            hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
+            // hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
             component: () => import('@/views/history/EntityHistory'),
-            meta: { title: '实体标注', keepAlive: true, permission: ['table'] }
+            meta: { title: '实体标注', keepAlive: true}
           },
           {
             path: '/list/relation-list',
             name: 'RelationHistory',
             component: () => import('@/views/history/RelationHistory'),
-            meta: { title: '关系标注', keepAlive: true, permission: ['table'] }
+            meta: { title: '关系标注', keepAlive: true }
+          }
+        ]
+      },
+      // 管理员全局列表
+      {
+        path: '/admin/list',
+        name: 'admin-list',
+        component: PageView,
+        redirect: '/admin/list/entity-list',
+        meta: { title: '全部审核', icon: 'table', permission: ['admin'] },
+        children: [
+          {
+            path: '/admin/list/entity-list',
+            name: 'AdminEntityHistory',
+            component: () => import('@/views/admin/history/EntityHistory'),
+            meta: { title: '实体标注', keepAlive: true }
+          },
+          {
+            path: '/admin/list/relation-list',
+            name: 'AdminRelationHistory',
+            component: () => import('@/views/admin/history/RelationHistory'),
+            meta: { title: '关系标注', keepAlive: true}
           }
         ]
       },
@@ -43,7 +75,7 @@ export const asyncRouterMap = [
         path: '/account/settings/base',
         name: 'accountSetting',
         component: () => import('@/views/account/settings/BaseSetting'),
-        meta: { title: '账户设置', icon: 'user', keepAlive: true, permission: ['user'] }
+        meta: { title: '账户设置', icon: 'user', keepAlive: true, permission: ["annotator"] }
       },
       // dashboard
       // {
@@ -293,63 +325,63 @@ export const asyncRouterMap = [
 
       // other
       // {
-      //   path: '/other',
-      //   name: 'otherPage',
-      //   component: PageView,
-      //   meta: { title: '其他组件', icon: 'slack', permission: [ 'dashboard' ] },
-      //   redirect: '/other/icon-selector',
-      //   children: [
-      //     {
-      //       path: '/other/icon-selector',
-      //       name: 'TestIconSelect',
-      //       component: () => import('@/views/other/IconSelectorView'),
-      //       meta: { title: 'IconSelector', icon: 'tool', keepAlive: true, permission: [ 'dashboard' ] }
-      //     },
-      //     {
-      //       path: '/other/list',
-      //       component: RouteView,
-      //       meta: { title: '业务布局', icon: 'layout', permission: [ 'support' ] },
-      //       redirect: '/other/list/tree-list',
-      //       children: [
-      //         {
-      //           path: '/other/list/tree-list',
-      //           name: 'TreeList',
-      //           component: () => import('@/views/other/TreeList'),
-      //           meta: { title: '树目录表格', keepAlive: true }
-      //         },
-      //         {
-      //           path: '/other/list/edit-table',
-      //           name: 'EditList',
-      //           component: () => import('@/views/other/TableInnerEditList'),
-      //           meta: { title: '内联编辑表格', keepAlive: true }
-      //         },
-      //         {
-      //           path: '/other/list/user-list',
-      //           name: 'UserList',
-      //           component: () => import('@/views/other/UserList'),
-      //           meta: { title: '用户列表', keepAlive: true }
-      //         },
-      //         {
-      //           path: '/other/list/role-list',
-      //           name: 'RoleList',
-      //           component: () => import('@/views/other/RoleList'),
-      //           meta: { title: '角色列表', keepAlive: true }
-      //         },
-      //         {
-      //           path: '/other/list/system-role',
-      //           name: 'SystemRole',
-      //           component: () => import('@/views/role/RoleList'),
-      //           meta: { title: '角色列表2', keepAlive: true }
-      //         },
-      //         {
-      //           path: '/other/list/permission-list',
-      //           name: 'PermissionList',
-      //           component: () => import('@/views/other/PermissionList'),
-      //           meta: { title: '权限列表', keepAlive: true }
-      //         }
-      //       ]
-      //     }
-      //   ]
+  //       path: '/other',
+  //       name: 'otherPage',
+  //       component: PageView,
+  //       meta: { title: '其他组件', icon: 'slack', permission: [ 'dashboard' ] },
+  //       redirect: '/other/icon-selector',
+  //       children: [
+  //         {
+  //           path: '/other/icon-selector',
+  //           name: 'TestIconSelect',
+  //           component: () => import('@/views/other/IconSelectorView'),
+  //           meta: { title: 'IconSelector', icon: 'tool', keepAlive: true, permission: [ 'dashboard' ] }
+  //         },
+  //         {
+  //           path: '/other/list',
+  //           component: RouteView,
+  //           meta: { title: '业务布局', icon: 'layout', permission: [ 'support' ] },
+  //           redirect: '/other/list/tree-list',
+  //           children: [
+  //             {
+  //               path: '/other/list/tree-list',
+  //               name: 'TreeList',
+  //               component: () => import('@/views/other/TreeList'),
+  //               meta: { title: '树目录表格', keepAlive: true }
+  //             },
+  //             {
+  //               path: '/other/list/edit-table',
+  //               name: 'EditList',
+  //               component: () => import('@/views/other/TableInnerEditList'),
+  //               meta: { title: '内联编辑表格', keepAlive: true }
+  //             },
+  //             {
+  //               path: '/other/list/user-list',
+  //               name: 'UserList',
+  //               component: () => import('@/views/other/UserList'),
+  //               meta: { title: '用户列表', keepAlive: true }
+  //             },
+  //             {
+  //               path: '/other/list/role-list',
+  //               name: 'RoleList',
+  //               component: () => import('@/views/other/RoleList'),
+  //               meta: { title: '角色列表', keepAlive: true }
+  //             },
+  //             {
+  //               path: '/other/list/system-role',
+  //               name: 'SystemRole',
+  //               component: () => import('@/views/role/RoleList'),
+  //               meta: { title: '角色列表2', keepAlive: true }
+  //             },
+  //             {
+  //               path: '/other/list/permission-list',
+  //               name: 'PermissionList',
+  //               component: () => import('@/views/other/PermissionList'),
+  //               meta: { title: '权限列表', keepAlive: true }
+  //             }
+  //           ]
+  //         }
+  //       ]
       // }
     ]
   },
@@ -386,20 +418,6 @@ export const constantRouterMap = [
       }
     ]
   },
-
-  {
-    path: '/test',
-    component: BlankLayout,
-    redirect: '/test/home',
-    children: [
-      {
-        path: 'home',
-        name: 'TestHome',
-        component: () => import('@/views/Home')
-      }
-    ]
-  },
-
   {
     path: '/404',
     component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
