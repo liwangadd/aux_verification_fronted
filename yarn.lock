@@ -4347,14 +4347,16 @@ eslint-scope@^4.0.0:
     estraverse "^4.1.1"
 
 eslint-utils@^1.3.0, eslint-utils@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/eslint-utils/-/eslint-utils-1.3.1.tgz#9a851ba89ee7c460346f97cf8939c7298827e512"
-  integrity sha512-Z7YjnIldX+2XMcjr7ZkgEsOj/bREONV60qYeB/bjMAqqqZ4zxKyWX+BOUkdmRmA9riiIPVvo5x86m5elviOk0Q==
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/eslint-utils/-/eslint-utils-1.4.3.tgz#74fec7c54d0776b6f67e0251040b5806564e981f"
+  integrity sha512-fbBN5W2xdY45KulGXmLHZ3c3FHfVYmKg0IrAKGOkT/464PQsx2UeIzfz1RmEci+KLm1bBaAzZAh8+/E+XAeZ8Q==
+  dependencies:
+    eslint-visitor-keys "^1.1.0"
 
-eslint-visitor-keys@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
-  integrity sha512-qzm/XxIbxm/FHyH341ZrbnMUpe+5Bocte9xkmFMzPMjRaZMcXww+MpBptFvtU+79L362nqiLhekCxCxDPaUMBQ==
+eslint-visitor-keys@^1.0.0, eslint-visitor-keys@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.1.0.tgz#e2a82cea84ff246ad6fb57f9bde5b46621459ec2"
+  integrity sha512-8y9YjtM1JBJU/A9Kc+SbaOV4y29sSWckBwMHa+FGtVj5gN/sbnKDf6xJUl+8g7FAij9LVaP8C24DUiH/f/2Z9A==
 
 eslint@^4.19.1:
   version "4.19.1"
@@ -10762,6 +10764,11 @@ vue-clipboard2@^0.2.1:
   integrity sha512-n6ie/0g0bKohmLlC/5ja1esq2Q0jQ5hWmhNSZcvCsWfDeDnVARjl6cBB9p72XV1nlVfuqsZcfV8HTjjZAIlLBA==
   dependencies:
     clipboard "^2.0.0"
+
+vue-context-menu@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/vue-context-menu/-/vue-context-menu-2.0.6.tgz#185107cd3ae51f25c53266a2751008fa7da4f34e"
+  integrity sha512-wTyyjWbrGq/Rc1iivHl9ryI0IcsodRgg46CAGCm6knADDsTj5qJzo2pPDfi6y2nQreg8llJC2lGGts88tMX1sQ==
 
 vue-cropper@0.4.4:
   version "0.4.4"
