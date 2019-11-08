@@ -70,7 +70,7 @@ export default {
         }
 
         // 继续寻找下一个实体
-        indexPos += legalPos + 1;
+        indexPos = legalPos + 1;
         if (indexPos >= htmlContent.length){
           this.$error({content:"没有找到相关实体"})
           return
