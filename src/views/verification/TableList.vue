@@ -125,7 +125,7 @@ export default {
       columns: [
         {
           title: "序号",
-          dataIndex: "id"
+          dataIndex: 'statId',
         },
         {
           title: '标注类型',

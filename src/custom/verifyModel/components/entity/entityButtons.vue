@@ -51,7 +51,7 @@ export default {
         legalPos = htmlContent.indexOf(selectText, indexPos)
         // 如果 没找到直接返回
         if (legalPos === -1){
-          this.$error({content:"实体之间不能相互包含"})
+          this.$error({content:"没有其他可以被标注的实体"})
           return
         }
 
@@ -64,7 +64,7 @@ export default {
           }
         }
 
-        // 如果 insertIndex 是一个偶数，则可以插入，否则就重新找
+        // 如果 insertIndex 是一个偶数(位于结束位置之后)，则可以插入，否则就重新找
         if (insertIndex % 2 === 0){
           break
         }

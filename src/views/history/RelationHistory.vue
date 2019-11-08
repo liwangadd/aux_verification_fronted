@@ -72,7 +72,7 @@ export default {
       columns: [
         {
           title: '序号',
-          dataIndex: 'id',
+          dataIndex: 'statId',
         },
         {
           title: '文本内容',
@@ -115,6 +115,7 @@ export default {
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         Object.assign (this.queryParam, parameter)
+        this.queryParam["statid"] = -1
         return listRelations (this.queryParam)
         .then ((res)=>{
           return res.result
