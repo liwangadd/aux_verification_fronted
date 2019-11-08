@@ -63,6 +63,7 @@ export default {
             break
           }
         }
+
         // 如果 insertIndex 是一个偶数，则可以插入，否则就重新找
         if (insertIndex % 2 === 0){
           break

@@ -124,6 +124,10 @@ export default {
       // 表头
       columns: [
         {
+          title: "序号",
+          dataIndex: "id"
+        },
+        {
           title: '标注类型',
           dataIndex: 'type',
           width: '100px',

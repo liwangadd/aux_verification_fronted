@@ -72,6 +72,10 @@ export default {
       //表头
       columns: [
         {
+          title: '序号',
+          dataIndex: 'id',
+        },
+        {
           title: '文本内容',
           dataIndex: 'content'
         },
