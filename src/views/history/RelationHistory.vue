@@ -1,5 +1,9 @@
 <template>
   <a-card :bordered="false">
+    <div class="search-box">
+      <a-input-search placeholder="输入序号进行搜索" @search="onSearch" enterButton />
+    </div>
+
     <s-table ref="table" size="default" rowKey="key" :columns="columns" :data="loadData">
 
         <span slot="status" slot-scope="text">
@@ -29,6 +33,13 @@
       />
   </a-card>
 </template>
+
+<style scoped>
+.search-box{
+  margin:10px 0;
+  width: 200px;
+}
+</style>
 
 <script>
 import { STable } from "@/components";
@@ -115,7 +126,9 @@ export default {
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         Object.assign (this.queryParam, parameter)
-        this.queryParam["statid"] = -1
+        if(!this.queryParam.hasOwnProperty("statId")){
+          this.queryParam["statId"] = -1
+        }
         return listRelations (this.queryParam)
         .then ((res)=>{
           return res.result
@@ -162,6 +175,23 @@ export default {
       this.verifyModalVisible = false
       this.propsToVerify = {}
     },
+
+    // 搜索
+    onSearch(val, e){
+      if (val === "") {
+        val = -1
+      }
+
+      this.queryParam = ({
+        pageNo: 1,
+        pageSize: 10,
+        statId: parseInt(val)
+      })
+
+      return listRelations (this.queryParam).then(res => {
+        this.$refs.table._data.localDataSource = res.result.data
+      });
+    }
   }
 }
 </script>
