@@ -25,10 +25,9 @@ export default {
       const self = this
       // change myValue: </tag> -> tag
       const tag = myValue.substring(2, myValue.length-1)
-      // 获取div及其内容, 内容不包含标签
+      // 获取div及其内容, 内容包含标签
       const myField = this.inObj
-      let content = myField.innerText
-      let htmlContent = myField.innerHTML
+      const htmlContent = myField.innerHTML
       // 判断是否选中
       const selectText = window.getSelection().toString()
       if (selectText === ""){
@@ -40,51 +39,53 @@ export default {
       const regTagBegin = /<\/?[a-z]+>/g
       let entPos = [];
       var match;
-      while ((match = regTagBegin.exec(htmlContent)) != null) {
+      while ((match = regTagBegin.exec(newHtml)) != null) {
         entPos.push(match.index)
       }
 
-      // 多次尝试寻找实体，得到一个合法的位置
+      // 寻找所有实体位置
       let legalPos = 0;
       let indexPos = 0;
-      while(true){
+      // 所有候选插入位置
+      let insertCandidates = []
+      while(legalPos != -1 && indexPos < htmlContent.length){
         legalPos = htmlContent.indexOf(selectText, indexPos)
-        // 如果 没找到直接返回
-        if (legalPos === -1){
-          this.$error({content:"没有其他可以被标注的实体"})
-          return
+        if (legalPos != -1){
+          insertCandidates.push(legalPos)
+          indexPos = legalPos + 1
+        }
+      }
+      console.log(entPos)
+      console.log(insertCandidates)
+
+      // 对每个insert位置做判断
+      let insertLegals = []
+      let compareIndex = 0
+      for (let index = 0; index < insertCandidates.length; index++) {
+        const insertPos = insertCandidates[index];
+        // 当插入位置小于某个已有实体位置时结束
+        while(insertPos >= entPos[compareIndex] && compareIndex < entPos.length){
+          compareIndex += 1
         }
 
-        // 找到了，验证其是否在已标注的实体内
-        let insertIndex = 0;
-        for (let index = 0; index < entPos.length; index++) {
-          if (legalPos < entPos[index]){
-            insertIndex = index;
-            break
-          }
+        // 偶数表明插入位置在一个tag end之后，合法
+        if (compareIndex % 2 === 0){
+          insertLegals.push(insertPos)
         }
-
-        // 如果 insertIndex 是一个偶数(位于结束位置之后)，则可以插入，否则就重新找
-        if (insertIndex % 2 === 0){
-          break
-        }
-
-        // 继续寻找下一个实体
-        indexPos = legalPos + 1;
-        if (indexPos >= htmlContent.length){
-          this.$error({content:"没有找到相关实体"})
-          return
-        }
-
-        continue;
       }
 
       // 插入实体
-      let newHtml = htmlContent.substring(0, legalPos)
+      let insertLength = 0
+      let newHtml = htmlContent
+      for (let index = 0; index < insertLegals.length; index++) {
+        const insertPos = insertLegals[index];
+        newHtml = newHtml.substring(0, insertPos+insertLength)
               + "<" + tag + ">"
               + selectText
               + "</" + tag + ">"
-              + htmlContent.substring(legalPos + selectText.length)
+              + htmlContent.substring(legalPos + selectText.length + insertLength)
+        insertLength += selectText.length
+      }
 
       this.$emit("addEntity", newHtml)
 
