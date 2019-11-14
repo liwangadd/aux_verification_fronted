@@ -39,7 +39,7 @@ export default {
       const regTagBegin = /<\/?[a-z]+>/g
       let entPos = [];
       var match;
-      while ((match = regTagBegin.exec(newHtml)) != null) {
+      while ((match = regTagBegin.exec(htmlContent)) != null) {
         entPos.push(match.index)
       }
 
@@ -55,8 +55,8 @@ export default {
           indexPos = legalPos + 1
         }
       }
-      console.log(entPos)
-      console.log(insertCandidates)
+      // console.log(entPos)
+      // console.log(insertCandidates)
 
       // 对每个insert位置做判断
       let insertLegals = []
@@ -68,7 +68,7 @@ export default {
           compareIndex += 1
         }
 
-        // 偶数表明插入位置在一个tag end之后，合法
+        // 偶数表明插入位置在一个tag end之后，合法(数组第一个是0)
         if (compareIndex % 2 === 0){
           insertLegals.push(insertPos)
         }
@@ -77,14 +77,16 @@ export default {
       // 插入实体
       let insertLength = 0
       let newHtml = htmlContent
+      // console.log("origin:", newHtml)
       for (let index = 0; index < insertLegals.length; index++) {
         const insertPos = insertLegals[index];
         newHtml = newHtml.substring(0, insertPos+insertLength)
               + "<" + tag + ">"
               + selectText
               + "</" + tag + ">"
-              + htmlContent.substring(legalPos + selectText.length + insertLength)
-        insertLength += selectText.length
+              + htmlContent.substring(insertPos+selectText.length)
+        insertLength += 5 + tag.length * 2
+        // console.log(index, newHtml)
       }
 
       this.$emit("addEntity", newHtml)
