@@ -108,7 +108,8 @@ export default {
     this.localPagination = ['auto', true].includes(this.showPagination) && Object.assign({}, this.localPagination, {
       current: localPageNum,
       pageSize: this.pageSize,
-      showSizeChanger: this.showSizeChanger
+      showSizeChanger: this.showSizeChanger,
+      showQuickJumper: true
     })
     this.needTotalList = this.initTotalList(this.columns)
     this.loadData()
