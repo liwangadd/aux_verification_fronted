@@ -40,6 +40,14 @@ export function openNextStatement (parameter) {
   })
 }
 
+export function openLastStatement () {
+  return axios({
+    url: '/ver/prev',
+    method: 'post',
+    data: {}
+  })
+}
+
 export function dealRelation (parameter) {
   return axios({
     url: '/ver/relation',

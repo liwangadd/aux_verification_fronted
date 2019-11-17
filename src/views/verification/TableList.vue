@@ -47,9 +47,17 @@
       size="large"
       type="primary"
       htmlType="submit"
-      class="login-button"
+      class="float-right"
       @click="getNextStatement({completeLast:true})"
     >下一条</a-button>
+
+    <a-button
+      size="large"
+      type="primary"
+      class="float-right"
+      @click="getLastStatement()"
+      ghost
+    >上一条</a-button>
 
     <verify-modal 
       ref="verifyModal" 
@@ -67,13 +75,15 @@
 button{
   margin-right: 10px
 }
-
+.float-right{
+  float: right;
+}
 </style>
 
 <script>
 import { STable } from '@/components'
 import verifyModal from '@/custom/verifyModel/verifyModal.vue'
-import { getEntityLabels, getVerifyContents, openNextStatement } from '@/api/verify'
+import { getEntityLabels, getVerifyContents, openNextStatement, openLastStatement } from '@/api/verify'
 import { getRelationLabels } from '@/api/verify'
 
 const statusMap = {
@@ -288,6 +298,22 @@ export default {
           })
         })
     },
+
+    // 获取上一条审核
+    getLastStatement(){
+      openLastStatement()
+        .then(res => {
+          this.handleOk()
+        })
+        .catch(err => {
+          this.$notification['info']({
+            message: '通知',
+            description: '没有更多的历史数据了',
+            duration: 1
+          })
+        })
+
+    }
   }
 }
 </script>
