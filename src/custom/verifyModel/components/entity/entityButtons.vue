@@ -16,6 +16,7 @@
 </style>
 
 <script>
+import { HTMLEncode } from '@/utils/util'
 export default {
   name: "entityButtons",
   props: ["buttonList", "content", "inObj"],
@@ -25,71 +26,47 @@ export default {
       const self = this
       // change myValue: </tag> -> tag
       const tag = myValue.substring(2, myValue.length-1)
-      // 获取div及其内容, 内容包含标签
-      const myField = this.inObj
-      const htmlContent = myField.innerHTML
+      // 获取div
+      const cNode = this.inObj
       // 判断是否选中
       const selectText = window.getSelection().toString()
       if (selectText === ""){
         return
       }
 
-      // 因为实体可能有重叠的情况，因此遍历文本
-      // 先获得所有实体开始与结束坐标, 按从小到大排列
-      const regTagBegin = /<\/?[a-z]+>/g
-      let entPos = [];
-      var match;
-      while ((match = regTagBegin.exec(htmlContent)) != null) {
-        entPos.push(match.index)
-      }
-
-      // 寻找所有实体位置
-      let legalPos = 0;
-      let indexPos = 0;
-      // 所有候选插入位置
-      let insertCandidates = []
-      while(legalPos != -1 && indexPos < htmlContent.length){
-        legalPos = htmlContent.indexOf(selectText, indexPos)
-        if (legalPos != -1){
-          insertCandidates.push(legalPos)
-          indexPos = legalPos + 1
-        }
-      }
-      // console.log(entPos)
-      // console.log(insertCandidates)
-
-      // 对每个insert位置做判断
-      let insertLegals = []
-      let compareIndex = 0
-      for (let index = 0; index < insertCandidates.length; index++) {
-        const insertPos = insertCandidates[index];
-        // 当插入位置小于某个已有实体位置时结束
-        while(insertPos >= entPos[compareIndex] && compareIndex < entPos.length){
-          compareIndex += 1
-        }
-
-        // 偶数表明插入位置在一个tag end之后，合法(数组第一个是0)
-        if (compareIndex % 2 === 0){
-          insertLegals.push(insertPos)
+      let newContent = ""
+      // 遍历所有子节点，只有text节点可以被添加标签
+      for (let index = 0; index < cNode.childNodes.length; index++) {
+        const element = cNode.childNodes[index]
+        // 只有text节点可以被添加标签
+        if (element.nodeType === document.TEXT_NODE){
+          // 寻找所有匹配的文本
+          var pos_array = []
+          var insertPos = 0
+          let content = element.textContent
+          while((insertPos = content.indexOf(selectText, insertPos)) !== -1) {
+            pos_array.push(insertPos)
+            insertPos += 1
+          }
+          // 找到了
+          if (pos_array.length !== 0){
+            let insertLength = 0
+            for (let i = 0; i < pos_array.length; i++) {
+              const pos = pos_array[i] + insertLength;
+              insertLength += tag.length * 2 + 5
+              content = content.substring(0, pos)
+                          + "<"+tag+">" + selectText + "</"+tag+">"
+                          + content.substring(pos + selectText.length)
+            }
+          }
+          newContent += content
+        }else{
+          const tag = element.tagName.toLowerCase()
+          newContent += "<"+tag+">" + element.innerText + "</"+tag+">"
         }
       }
 
-      // 插入实体
-      let insertLength = 0
-      let newHtml = htmlContent
-      // console.log("origin:", newHtml)
-      for (let index = 0; index < insertLegals.length; index++) {
-        const insertPos = insertLegals[index];
-        newHtml = newHtml.substring(0, insertPos+insertLength)
-              + "<" + tag + ">"
-              + selectText
-              + "</" + tag + ">"
-              + htmlContent.substring(insertPos+selectText.length)
-        insertLength += 5 + tag.length * 2
-        // console.log(index, newHtml)
-      }
-
-      this.$emit("addEntity", newHtml)
+      this.$emit("addEntity", newContent)
 
     },
 

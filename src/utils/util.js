@@ -64,3 +64,12 @@ export function removeLoadingAnimate (id = '', timeout = 1500) {
     document.body.removeChild(document.getElementById(id))
   }, timeout)
 }
+
+// 转义html
+export function HTMLEncode(html) {
+  var temp = document.createElement("div");
+  (temp.textContent != null) ? (temp.textContent = html) : (temp.innerText = html);
+  var output = temp.innerHTML;
+  temp = null;
+  return output;
+}

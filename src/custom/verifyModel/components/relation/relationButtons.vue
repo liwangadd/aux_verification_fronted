@@ -74,7 +74,7 @@ export default {
       // 得到另一个实体在 text 中的位置
       let oPos = 0;
       for (let index = 0; index < myField.childNodes.length; index++) {
-          var cnode = myField.childNodes[index];
+          const cnode = myField.childNodes[index];
           if (oEntObj === cnode) break;
           // 找到的节点都需要加上 offset
           oPos += cnode.nodeType === document.TEXT_NODE ?
@@ -85,12 +85,12 @@ export default {
       let e1,e2, e1Pos, e2Pos;
       if (entV === "e1"){
         e1 = selectText;
-        e2 = oEntObj.innerText;
+        e2 = oEntObj.innerText
         e1Pos = start; 
         e2Pos = oPos;
       }else{
         e2 = selectText;
-        e1 = oEntObj.innerText;
+        e1 = oEntObj.innerText
         e2Pos = start; 
         e1Pos = oPos;
       }

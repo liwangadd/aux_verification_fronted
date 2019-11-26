@@ -36,6 +36,7 @@
 
 <script>
 import contextMenu from 'vue-context-menu'
+import { HTMLEncode } from '@/utils/util'
 // 自动生成 style
 import Vue from "vue"
 Vue.component('v-style', {
@@ -78,23 +79,27 @@ export default {
     },
 
     deleteNER(e){
-      let eNode = e.outerHTML
+      // e 为 被选中的节点
+      // 上下文
       let cNode = this.$refs.contextarea
-      let content = cNode.innerHTML;
-      let ePos = 0;
-      // 得到点击实体在 text 中的位置
+
+      let newContent = ""
+      //直接判断 e 和选中节点是否相同即可，注意转义
       for (let index = 0; index < cNode.childNodes.length; index++) {
         const element = cNode.childNodes[index];
-        if (element === e) break;
-        // 找到的节点都需要加上 offset
-        ePos += element.nodeType === document.TEXT_NODE ?
-                element.length : element.outerHTML.length;
+        if (element === e) {
+          newContent += element.innerText
+        }else{
+          if (element.nodeType === document.TEXT_NODE){
+            newContent += element.textContent
+          }else{
+            const tag = element.tagName.toLowerCase()
+            newContent += "<"+tag+">" + element.innerText + "</"+tag+">"
+          }
+        }
       }
-      let newcontent = content.substring(0, ePos)
-              + e.innerText
-              + content.substring(ePos + eNode.length)
 
-      this.$emit("update", newcontent)
+      this.$emit("update", newContent)
     }
   },
   computed: {

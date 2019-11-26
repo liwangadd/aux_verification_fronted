@@ -65,6 +65,7 @@ import { dealEntity, prefixOpinion, dealRelation, addRelation } from '@/api/veri
 import entity from './components/entity/entity.vue'
 import relation from './components/relation/relation.vue'
 import pdf from './components/pdf.vue'
+import { HTMLEncode, HTMLDecode } from '@/utils/util'
 
 export default {
   props:[
