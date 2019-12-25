@@ -101,7 +101,7 @@
         <a>
           <a-icon class="item-icon" type="weibo-circle"></a-icon>
         </a> -->
-        <!-- <router-link class="register" :to="{ name: 'register' }">注册账户</router-link> -->
+        <router-link class="register" :to="{ name: 'register' }">注册账户</router-link>
       </div>
     </a-form>
 

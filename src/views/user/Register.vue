@@ -24,7 +24,7 @@
               :strokeColor=" passwordLevelColor "
             />
             <div style="margin-top: 10px">
-              <span>请至少输入 6 个字符。请不要使用容易被猜到的密码。</span>
+              <span>请至少输入 6 个字符。</span>
             </div>
           </div>
         </template>
@@ -181,7 +181,7 @@ export default {
         if (level === 0) {
           this.state.percent = 10
         }
-        callback(new Error('密码强度不够'))
+        callback()
       }
     },
 
