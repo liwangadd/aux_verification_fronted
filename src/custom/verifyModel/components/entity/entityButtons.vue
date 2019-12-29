@@ -35,6 +35,11 @@ export default {
       if (selectText === ""){
         return
       }
+      // 如果没有二级菜单，直接应用
+      if (b.children.length === 0){
+        self.insertAtCursor(b.value);
+        return;
+      }
       
       function setSelectValue(e, value){
         e.$refs.secondSelect.value = value
@@ -49,9 +54,8 @@ export default {
             <a-select ref="secondSelect" style="width: 200px" maxTagCount={6} value={self.selectValue} onChange={(v) => setSelectValue(this, v)} >
               <a-select-option key={b.name} value={b.value}> {b.name} </a-select-option>
               {
-                self.buttonList.map(item => {
-                  if (item == b) return;
-                  return <a-select-option key={b.name} value={item.value}> {item.name} </a-select-option>
+                b.children.map(item => {
+                  return <a-select-option key={item.name} value={item.value}> {item.name} </a-select-option>
                 })
               }
             </a-select>
@@ -67,10 +71,10 @@ export default {
       });
 
       // 对模态框的任何多余操作都会导致选中文本失焦，因此直接关闭文本框
-      document.getElementsByClassName("secondSelectModel")[0].addEventListener("click", (e) => {
-        e.preventDefault();
-        model.destroy();
-      });
+      // document.getElementsByClassName("secondSelectModel")[0].addEventListener("click", (e) => {
+      //   e.preventDefault();
+      //   model.destroy();
+      // });
 
       document.getElementsByClassName("secondSelectModel")[0].addEventListener("contextmenu",(e) =>{
         e.preventDefault();

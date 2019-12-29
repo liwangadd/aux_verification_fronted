@@ -6,9 +6,18 @@
     </context-menu>
     <v-style>
       <slot v-for="b in buttonList">
+        <!-- <tag> {background-color: } -->
         {{b.value.substring(2,b.value.length-1)}} {
           background-color: {{b.color}};
         }
+        <slot v-if="b.children.length != 0">
+          <slot v-for="bb in b.children">
+        {{bb.value.substring(2,bb.value.length-1)}} {
+          background-color: {{bb.color}};
+        }
+
+          </slot>
+        </slot>
       </slot>
     </v-style>
     <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol">
