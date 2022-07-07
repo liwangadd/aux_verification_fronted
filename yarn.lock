@@ -7413,10 +7413,10 @@ mockjs2@^1.0.5:
   dependencies:
     commander "*"
 
-moment@^2.21.0, moment@^2.24.0:
-  version "2.24.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
-  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
+moment@^2.21.0, moment@^2.29.4:
+  version "2.29.4"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
+  integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
@@ -10762,6 +10762,11 @@ vue-clipboard2@^0.2.1:
   integrity sha512-n6ie/0g0bKohmLlC/5ja1esq2Q0jQ5hWmhNSZcvCsWfDeDnVARjl6cBB9p72XV1nlVfuqsZcfV8HTjjZAIlLBA==
   dependencies:
     clipboard "^2.0.0"
+
+vue-context-menu@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/vue-context-menu/-/vue-context-menu-2.0.6.tgz#185107cd3ae51f25c53266a2751008fa7da4f34e"
+  integrity sha512-wTyyjWbrGq/Rc1iivHl9ryI0IcsodRgg46CAGCm6knADDsTj5qJzo2pPDfi6y2nQreg8llJC2lGGts88tMX1sQ==
 
 vue-cropper@0.4.4:
   version "0.4.4"
